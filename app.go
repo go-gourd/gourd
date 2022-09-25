@@ -3,10 +3,11 @@ package gourd
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/go-gourd/gourd/config"
 	"github.com/go-gourd/gourd/core"
 	"github.com/go-gourd/gourd/event"
-	"io"
-	"os"
+	"github.com/go-gourd/gourd/log"
+	"strconv"
 )
 
 type Application struct {
@@ -14,6 +15,7 @@ type Application struct {
 	VersionName string
 	Event       event.GourdEvent
 	Engine      *gin.Engine
+	Config      config.AppConfig
 }
 
 var globalEvent = event.GourdEvent{}
@@ -31,12 +33,7 @@ func createApp() {
 		globalEvent.Boot()
 	}
 
-	var logo = core.GetLogo()
-
-	//控制台输出logo
-	fmt.Printf(logo, globalApp.VersionName, 8080)
-
-	gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(globalApp.Config.ReleaseMode)
 
 	globalApp.Engine = gin.New()
 
@@ -56,18 +53,17 @@ func GetServer() *gin.Engine {
 
 func StartServer() error {
 
-	f, _ := os.Create("gin.log")
-	gin.DefaultWriter = io.MultiWriter(f)
+	//App配置获取
+	var cfg config.AppConfig
+	err := config.GetConfig("app", &cfg)
+	if err != nil {
+		log.Info(err.Error())
+	}
+	globalApp.Config = cfg
 
-	//TODO: 配置获取
-	//var cfg config.AppConfig
-	//err := config.GetConfig("app", &cfg)
-	//if err != nil {
-	//	log.Info(err.Error())
-	//}
-	//
-	//fmt.Print("App.Port = ")
-	//fmt.Println(cfg.Port)
+	if cfg.Port == 0 {
+		cfg.Port = 8080 //默认端口
+	}
 
 	app := GetServer()
 
@@ -76,7 +72,13 @@ func StartServer() error {
 		globalEvent.Start()
 	}
 
-	return app.Run()
+	addr := cfg.Ip + ":" + strconv.Itoa(cfg.Port)
+
+	var logo = core.GetLogo()
+	//控制台输出logo
+	fmt.Printf(logo, globalApp.VersionName, addr)
+
+	return app.Run(addr)
 }
 
 // RegisterEvent 注册全局事件
