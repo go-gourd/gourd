@@ -5,14 +5,6 @@ import (
 	"os"
 )
 
-type AppConfig struct {
-	Name        string //应用名称
-	ReleaseMode string //应用模式
-	Ip          string
-	Port        int  //Web端口
-	Debug       bool //是否调试模式
-}
-
 func GetConfig(name string, cfg interface{}) error {
 
 	var file = "./config/" + name + ".toml"

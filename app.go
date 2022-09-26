@@ -61,8 +61,11 @@ func StartServer() error {
 	}
 	globalApp.Config = cfg
 
+	//TODO: 开发项目主目录
+
+	//默认端口
 	if cfg.Port == 0 {
-		cfg.Port = 8080 //默认端口
+		cfg.Port = 8080
 	}
 
 	app := GetServer()
