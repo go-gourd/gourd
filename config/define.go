@@ -14,3 +14,12 @@ type LogConfig struct {
 	LogFile string //日志文件
 	Console bool   //是否开启控制台输出
 }
+
+type Database struct {
+	Driver string //驱动
+	Db     string
+	Host   string
+	Port   uint
+	User   string
+	Pass   string
+}

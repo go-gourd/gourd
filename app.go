@@ -63,11 +63,6 @@ func StartServer(isDaemon bool) {
 		cfg.Port = 8080
 	}
 
-	//执行Start事件
-	if globalEvent.Start != nil {
-		globalEvent.Start()
-	}
-
 	addr := cfg.Ip + ":" + strconv.Itoa(cfg.Port)
 
 	var logo = core.GetLogo()
@@ -76,6 +71,11 @@ func StartServer(isDaemon bool) {
 
 	//启动服务
 	go runGinHttpServer(addr)
+
+	//执行Start事件
+	if globalEvent.Start != nil {
+		globalEvent.Start()
+	}
 
 	//守护进程
 	if isDaemon {
