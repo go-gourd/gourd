@@ -35,10 +35,7 @@ func newLogger() {
 	}
 	if logConf.LogFile != "" {
 
-		paths, fileName := filepath.Split(logConf.LogFile)
-
-		fmt.Println(paths)
-		fmt.Println(fileName)
+		paths, _ := filepath.Split(logConf.LogFile)
 
 		//检查并创建目录
 		err := utils.CheckAndMkdir(paths)

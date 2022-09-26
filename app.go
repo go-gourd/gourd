@@ -26,32 +26,29 @@ var globalApp = Application{
 	Event:       globalEvent,
 }
 
-func createApp() {
-
-	//执行boot事件
-	if globalEvent.Boot != nil {
-		globalEvent.Boot()
-	}
-
-	gin.SetMode(globalApp.Config.ReleaseMode)
-
-	globalApp.Engine = gin.New()
-
-	//执行Init事件
-	if globalEvent.Init != nil {
-		globalEvent.Init()
-	}
-
-}
-
+// GetServer 获取或者创建一个服务
 func GetServer() *gin.Engine {
 	if globalApp.Engine == nil {
-		createApp()
+
+		//执行boot事件
+		if globalEvent.Boot != nil {
+			globalEvent.Boot()
+		}
+
+		gin.SetMode(globalApp.Config.ReleaseMode)
+
+		globalApp.Engine = gin.New()
+
+		//执行Init事件
+		if globalEvent.Init != nil {
+			globalEvent.Init()
+		}
 	}
 	return globalApp.Engine
 }
 
-func StartServer() error {
+// StartServer 启动服务
+func StartServer(isDaemon bool) {
 
 	//App配置获取
 	var cfg config.AppConfig
@@ -61,14 +58,10 @@ func StartServer() error {
 	}
 	globalApp.Config = cfg
 
-	//TODO: 开发项目主目录
-
 	//默认端口
 	if cfg.Port == 0 {
 		cfg.Port = 8080
 	}
-
-	app := GetServer()
 
 	//执行Start事件
 	if globalEvent.Start != nil {
@@ -81,10 +74,24 @@ func StartServer() error {
 	//控制台输出logo
 	fmt.Printf(logo, globalApp.VersionName, addr)
 
-	return app.Run(addr)
+	//启动服务
+	go runGinHttpServer(addr)
+
+	//守护进程
+	if isDaemon {
+		select {}
+	}
 }
 
-// RegisterEvent 注册全局事件
+// 启动Gin服务
+func runGinHttpServer(addr string) {
+	err := GetServer().Run(addr)
+	if err != nil {
+		log.Error(err.Error())
+	}
+}
+
+// RegisterEvent 注册全局系统事件
 func RegisterEvent(name string, callback event.Handler) {
 
 	if name == "boot" {
