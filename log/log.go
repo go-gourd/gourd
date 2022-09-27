@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"path/filepath"
 	"runtime"
+	"time"
 )
 
 //logger := zap.NewExample()
@@ -62,13 +63,17 @@ func newLogger() {
 			StacktraceKey:  "stacktrace",
 			LineEnding:     zapcore.DefaultLineEnding,
 			EncodeLevel:    zapcore.LowercaseLevelEncoder,
-			EncodeTime:     zapcore.ISO8601TimeEncoder,
+			EncodeTime:     TimeEncoder,
 			EncodeDuration: zapcore.SecondsDurationEncoder,
 			//EncodeCaller:   zapcore.ShortCallerEncoder,
 		},
 	}
 
 	logger = zap.Must(cfg.Build())
+}
+
+func TimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+	enc.AppendString(t.Format("2006-01-02 15:04:05"))
 }
 
 func getLogger() *zap.Logger {

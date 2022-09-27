@@ -1,13 +1,18 @@
 package gourd
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-gourd/gourd/config"
 	"github.com/go-gourd/gourd/core"
 	"github.com/go-gourd/gourd/event"
 	"github.com/go-gourd/gourd/log"
+	"net/http"
+	"os"
+	"os/signal"
 	"strconv"
+	"time"
 )
 
 type Application struct {
@@ -16,6 +21,7 @@ type Application struct {
 	Event       event.GourdEvent
 	Engine      *gin.Engine
 	Config      config.AppConfig
+	Http        *http.Server
 }
 
 var globalEvent = event.GourdEvent{}
@@ -79,14 +85,34 @@ func StartServer(isDaemon bool) {
 
 	//守护进程
 	if isDaemon {
-		select {}
+
+		// 等待中断信号以优雅地关闭服务器（设置 5 秒的超时时间）
+		quit := make(chan os.Signal)
+		signal.Notify(quit, os.Interrupt)
+		<-quit
+		log.Info("Shutdown Server ...")
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if e := globalApp.Http.Shutdown(ctx); e != nil {
+			log.Error("Server Shutdown:" + e.Error())
+		}
+		log.Info("Server exiting")
 	}
 }
 
 // 启动Gin服务
 func runGinHttpServer(addr string) {
-	err := GetServer().Run(addr)
-	if err != nil {
+
+	log.Info("Start gin http server. " + addr)
+
+	globalApp.Http = &http.Server{
+		Addr:    addr,
+		Handler: GetServer(),
+	}
+
+	// 服务连接
+	if err := globalApp.Http.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Error(err.Error())
 	}
 }
