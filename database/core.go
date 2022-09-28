@@ -20,7 +20,7 @@ func ConnDb() {
 	var cfg config.Database
 	err := config.GetConfig("database", &cfg)
 	if err != nil {
-		glog.Info(err.Error())
+		glog.Error(err.Error())
 	}
 
 	dsn := cfg.User + ":" + cfg.Pass + "@tcp(" + cfg.Host + ":" + strconv.Itoa(int(cfg.Port)) +
