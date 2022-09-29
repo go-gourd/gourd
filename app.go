@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-gourd/gourd/config"
 	"github.com/go-gourd/gourd/core"
+	"github.com/go-gourd/gourd/cron"
 	"github.com/go-gourd/gourd/event"
 	"github.com/go-gourd/gourd/log"
 	"net/http"
@@ -36,19 +37,10 @@ var globalApp = Application{
 func GetServer() *gin.Engine {
 	if globalApp.Engine == nil {
 
-		//执行boot事件
-		if globalEvent.Boot != nil {
-			globalEvent.Boot()
-		}
-
 		gin.SetMode(globalApp.Config.ReleaseMode)
 
 		globalApp.Engine = gin.New()
 
-		//执行Init事件
-		if globalEvent.Init != nil {
-			globalEvent.Init()
-		}
 	}
 	return globalApp.Engine
 }
@@ -64,6 +56,11 @@ func StartServer(isDaemon bool) {
 	}
 	globalApp.Config = cfg
 
+	//执行boot事件
+	if globalEvent.Boot != nil {
+		globalEvent.Boot()
+	}
+
 	//默认端口
 	if cfg.Port == 0 {
 		cfg.Port = 8080
@@ -75,6 +72,14 @@ func StartServer(isDaemon bool) {
 	//控制台输出logo
 	fmt.Printf(logo, globalApp.VersionName, addr)
 
+	//初始化服务
+	GetServer()
+
+	//执行Init事件
+	if globalEvent.Init != nil {
+		globalEvent.Init()
+	}
+
 	//启动服务
 	go runGinHttpServer(addr)
 
@@ -82,6 +87,9 @@ func StartServer(isDaemon bool) {
 	if globalEvent.Start != nil {
 		globalEvent.Start()
 	}
+
+	//启动定时任务
+	go cron.Start()
 
 	//守护进程
 	if isDaemon {
