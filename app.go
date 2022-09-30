@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-gourd/gourd/config"
 	"github.com/go-gourd/gourd/core"
+	corehttp "github.com/go-gourd/gourd/core/http"
 	"github.com/go-gourd/gourd/cron"
 	"github.com/go-gourd/gourd/event"
 	"github.com/go-gourd/gourd/log"
@@ -40,6 +41,9 @@ func GetServer() *gin.Engine {
 		gin.SetMode(globalApp.Config.ReleaseMode)
 
 		globalApp.Engine = gin.New()
+
+		//设置默认路由
+		corehttp.InitDefaultRoute(globalApp.Engine)
 
 	}
 	return globalApp.Engine
