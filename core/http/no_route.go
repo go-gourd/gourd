@@ -3,7 +3,6 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-gourd/gourd/config"
-	"github.com/go-gourd/gourd/log"
 	"os"
 )
 
@@ -15,8 +14,6 @@ func InitDefaultRoute(router *gin.Engine) {
 		//App配置获取
 		var cfg config.AppConfig
 		err := config.GetConfig("app", &cfg)
-
-		log.Info(cfg.ReleaseMode)
 
 		if err == nil {
 			if cfg.PublicPath != "" {
@@ -30,11 +27,7 @@ func InitDefaultRoute(router *gin.Engine) {
 					c.File(fileName)
 					return
 				}
-			} else {
-				log.Info("路径配置：" + cfg.PublicPath)
 			}
-		} else {
-			log.Error(err.Error())
 		}
 
 		//404操作
