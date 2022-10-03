@@ -22,7 +22,7 @@ func newLogger() {
 	logConf := config.LogConfig{}
 
 	//获取日志配置信息
-	err := config.GetConfig("log", &logConf)
+	err := config.ParseConfig("log", &logConf)
 	if err != nil {
 		panic(err)
 	}

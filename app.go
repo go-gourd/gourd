@@ -54,7 +54,7 @@ func StartServer(isDaemon bool) {
 
 	//App配置获取
 	var cfg config.AppConfig
-	err := config.GetConfig("app", &cfg)
+	err := config.ParseConfig("app", &cfg)
 	if err != nil {
 		log.Info(err.Error())
 	}

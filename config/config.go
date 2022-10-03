@@ -5,7 +5,8 @@ import (
 	"os"
 )
 
-func GetConfig(name string, cfg interface{}) error {
+// ParseConfig 解析配置文件
+func ParseConfig(name string, cfg interface{}) error {
 
 	var file = "./config/" + name + ".toml"
 	var doc, err = ReadFile(file)

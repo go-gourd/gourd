@@ -15,7 +15,7 @@ func SessionMiddle() gin.HandlerFunc {
 
 	cfg := gdsession.SessionConfig{}
 
-	err := config.GetConfig("session", &cfg)
+	err := config.ParseConfig("session", &cfg)
 	if err != nil {
 		log.Error(err.Error())
 	}

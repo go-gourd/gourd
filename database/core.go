@@ -18,7 +18,7 @@ func ConnDb() {
 
 	//App配置获取
 	var cfg config.Database
-	err := config.GetConfig("database", &cfg)
+	err := config.ParseConfig("database", &cfg)
 	if err != nil {
 		glog.Error(err.Error())
 	}
