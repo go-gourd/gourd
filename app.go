@@ -5,11 +5,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-gourd/gourd/config"
-	"github.com/go-gourd/gourd/core"
-	corehttp "github.com/go-gourd/gourd/core/http"
-	"github.com/go-gourd/gourd/cron"
-	"github.com/go-gourd/gourd/event"
 	"github.com/go-gourd/gourd/log"
+	"go.uber.org/zap"
 	"net/http"
 	"os"
 	"os/signal"
@@ -17,130 +14,75 @@ import (
 	"time"
 )
 
-type Application struct {
+type App struct {
 	Version     int
 	VersionName string
-	Event       event.GourdEvent
-	Engine      *gin.Engine
-	Config      config.AppConfig
-	Http        *http.Server
+	ginEngine   *gin.Engine
+	httpServer  *http.Server
+	conf        *config.AppConfig
 }
 
-var globalEvent = event.GourdEvent{}
-
-var globalApp = Application{
-	Version:     100,
-	VersionName: "1.0.0",
-	Event:       globalEvent,
+func (app *App) Init() {
+	app.Version = 2
+	app.VersionName = "0.2.0"
+	app.conf = config.GetAppConfig()
 }
 
-// GetServer 获取或者创建一个服务
-func GetServer() *gin.Engine {
-	if globalApp.Engine == nil {
+func (app *App) Create() *gin.Engine {
 
-		gin.SetMode(globalApp.Config.ReleaseMode)
+	fmt.Println("starting...")
 
-		globalApp.Engine = gin.New()
-
-		//设置默认路由
-		corehttp.InitDefaultRoute(globalApp.Engine)
-
+	if app.conf.Debug {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
 	}
-	return globalApp.Engine
+
+	r := gin.New()
+
+	app.ginEngine = r
+
+	return r
 }
 
-// StartServer 启动服务
-func StartServer(isDaemon bool) {
+func (app *App) Run() {
 
-	//App配置获取
-	var cfg config.AppConfig
-	err := config.ParseConfig("app", &cfg)
-	if err != nil {
-		log.Info(err.Error())
-	}
-	globalApp.Config = cfg
+	go app.runHttpServer()
 
-	//执行boot事件
-	if globalEvent.Boot != nil {
-		globalEvent.Boot()
+	// 守护进程 -等待中断信号以优雅地关闭服务器（设置 5 秒的超时时间）
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+	log.Info("Shutdown Server ...", zap.Skip())
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if e := app.httpServer.Shutdown(ctx); e != nil {
+		log.Error("Server Shutdown:" + e.Error())
 	}
+	log.Info("Server exiting", zap.Skip())
+}
+
+func (app *App) runHttpServer() {
+
+	httpConf := config.GetHttpConfig()
 
 	//默认端口
-	if cfg.Port == 0 {
-		cfg.Port = 8080
+	if httpConf.Port == 0 {
+		httpConf.Port = 8080
 	}
 
-	addr := cfg.Ip + ":" + strconv.Itoa(cfg.Port)
+	listen := httpConf.Host + ":" + strconv.Itoa(int(httpConf.Port))
 
-	var logo = core.GetLogo()
-	//控制台输出logo
-	fmt.Printf(logo, globalApp.VersionName, addr)
+	log.Info("Started http server. "+listen, zap.Skip())
 
-	//初始化服务
-	GetServer()
-
-	//执行Init事件
-	if globalEvent.Init != nil {
-		globalEvent.Init()
-	}
-
-	//启动服务
-	go runGinHttpServer(addr)
-
-	//执行Start事件
-	if globalEvent.Start != nil {
-		globalEvent.Start()
-	}
-
-	//启动定时任务
-	go cron.Start()
-
-	//守护进程
-	if isDaemon {
-
-		// 等待中断信号以优雅地关闭服务器（设置 5 秒的超时时间）
-		quit := make(chan os.Signal)
-		signal.Notify(quit, os.Interrupt)
-		<-quit
-		log.Info("Shutdown Server ...")
-
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		if e := globalApp.Http.Shutdown(ctx); e != nil {
-			log.Error("Server Shutdown:" + e.Error())
-		}
-		log.Info("Server exiting")
-	}
-}
-
-// 启动Gin服务
-func runGinHttpServer(addr string) {
-
-	log.Info("Start gin http server. " + addr)
-
-	globalApp.Http = &http.Server{
-		Addr:    addr,
-		Handler: GetServer(),
+	app.httpServer = &http.Server{
+		Addr:    listen,
+		Handler: app.ginEngine,
 	}
 
 	// 服务连接
-	if err := globalApp.Http.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	if err := app.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Error(err.Error())
 	}
-}
-
-// RegisterEvent 注册全局系统事件
-func RegisterEvent(name string, callback event.Handler) {
-
-	if name == "boot" {
-		// 框架启动前
-		globalEvent.Boot = callback
-	} else if name == "init" {
-		// 框架初始化后
-		globalEvent.Init = callback
-	} else if name == "start" {
-		// 服务启动时
-		globalEvent.Start = callback
-	}
-
 }

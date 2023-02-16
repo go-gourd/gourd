@@ -3,9 +3,9 @@ package log
 import (
 	"fmt"
 	"github.com/go-gourd/gourd/config"
-	"github.com/go-gourd/gourd/utils"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"os"
 	"path/filepath"
 	"runtime"
 	"time"
@@ -19,18 +19,14 @@ var logger *zap.Logger
 
 func newLogger() {
 
-	logConf := config.LogConfig{}
-
-	//获取日志配置信息
-	err := config.ParseConfig("log", &logConf)
-	if err != nil {
-		panic(err)
-	}
+	logConf := config.GetLogConfig()
 
 	level, _ := zap.ParseAtomicLevel(logConf.Level)
 
 	//输出路径，路径可以是文件路径和stdout
 	var outPut []string
+
+	//是否输出到控制台显示
 	if logConf.Console {
 		outPut = append(outPut, "stdout")
 	}
@@ -39,7 +35,7 @@ func newLogger() {
 		paths, _ := filepath.Split(logConf.LogFile)
 
 		//检查并创建目录
-		err := utils.CheckAndMkdir(paths)
+		err := checkAndMkdir(paths)
 		if err != nil {
 			fmt.Println("Err:" + err.Error())
 			panic(err)
@@ -86,48 +82,69 @@ func getLogger() *zap.Logger {
 // AddCommonField 添加公共字段
 func AddCommonField(fields []zapcore.Field) []zapcore.Field {
 
+	//跳过调用栈记录
+	if len(fields) == 1 && fields[0].Type == zapcore.SkipType {
+		return fields
+	}
+
 	//调用栈信息
 	pc, _, line, _ := runtime.Caller(2)
-	funcName := runtime.FuncForPC(pc).Name()
+	caller := runtime.FuncForPC(pc).Name()
 
-	fields = append(fields, zap.String("func", utils.GetRelativePath(funcName)))
+	fields = append(fields, zap.String("caller", getRelativePath(caller)))
 	fields = append(fields, zap.Int("line", line))
 
 	return fields
 }
 
 func Info(msg string, fields ...zapcore.Field) {
-
-	//添加公共字段
 	fields = AddCommonField(fields)
-
-	logger := getLogger()
-	logger.Info(msg, fields...)
+	getLogger().Info(msg, fields...)
 }
 
 func Debug(msg string, fields ...zapcore.Field) {
-
-	//添加公共字段
 	fields = AddCommonField(fields)
-
-	logger := getLogger()
-	logger.Debug(msg, fields...)
+	getLogger().Debug(msg, fields...)
 }
 
 func Warn(msg string, fields ...zapcore.Field) {
-
-	//添加公共字段
 	fields = AddCommonField(fields)
-
-	logger := getLogger()
-	logger.Warn(msg, fields...)
+	getLogger().Warn(msg, fields...)
 }
 
 func Error(err string, fields ...zapcore.Field) {
-
-	//添加公共字段
 	fields = AddCommonField(fields)
+	getLogger().Error(err, fields...)
+}
 
-	logger := getLogger()
-	logger.Error(err, fields...)
+func checkAndMkdir(path string) error {
+	_, err := os.Stat(path)
+	if err == nil {
+		return nil
+	}
+	if !os.IsNotExist(err) {
+		return nil
+	}
+	err = os.Mkdir(path, os.ModePerm)
+	if err == nil {
+		return err
+	}
+	return nil
+}
+
+func getRelativePath(path string) string {
+	if filepath.IsAbs(path) {
+		p, err := filepath.Rel(getRootPath(), path)
+		if err != nil {
+			return path
+		}
+		return p
+	} else {
+		return path
+	}
+}
+
+func getRootPath() string {
+	str, _ := os.Getwd()
+	return str
 }
