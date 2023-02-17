@@ -16,3 +16,12 @@ type LogConfig struct {
 	LogFile string //日志文件
 	Console bool   //是否开启控制台输出
 }
+
+type DbConfig struct {
+	Host     string //连接地址
+	Port     int    //端口
+	User     string //用户
+	Pass     string //密码
+	Database string //数据库名
+	Param    string //连接参数
+}
