@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-gourd/gourd/config"
+	"github.com/go-gourd/gourd/event"
 	"github.com/go-gourd/gourd/log"
 	"go.uber.org/zap"
 	"net/http"
@@ -23,9 +24,13 @@ type App struct {
 }
 
 func (app *App) Init() {
+
 	app.Version = 2
 	app.VersionName = "0.2.0"
 	app.conf = config.GetAppConfig()
+
+	//触发Boot事件
+	event.OnEvent("_boot", nil)
 }
 
 func (app *App) Create() *gin.Engine {
@@ -46,14 +51,22 @@ func (app *App) Create() *gin.Engine {
 }
 
 func (app *App) Run() {
+	//触发Init事件
+	event.OnEvent("_init", nil)
 
 	go app.runHttpServer()
+
+	//触发Start事件
+	event.OnEvent("_start", nil)
 
 	// 守护进程 -等待中断信号以优雅地关闭服务器（设置 5 秒的超时时间）
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 	log.Info("Shutdown Server ...", zap.Skip())
+
+	//触发停止事件
+	event.OnEvent("_start", nil)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
