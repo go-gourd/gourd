@@ -17,6 +17,8 @@ import (
 
 var logger *zap.Logger
 
+var FilePath string
+
 func newLogger() {
 
 	logConf := config.GetLogConfig()
@@ -30,9 +32,11 @@ func newLogger() {
 	if logConf.Console {
 		outPut = append(outPut, "stdout")
 	}
-	if logConf.LogFile != "" {
+	FilePath = logConf.LogFile
 
-		paths, _ := filepath.Split(logConf.LogFile)
+	if FilePath != "" {
+
+		paths, _ := filepath.Split(FilePath)
 
 		//检查并创建目录
 		err := checkAndMkdir(paths)
@@ -41,7 +45,7 @@ func newLogger() {
 			panic(err)
 		}
 
-		outPut = append(outPut, logConf.LogFile)
+		outPut = append(outPut, FilePath)
 	}
 
 	cfg := zap.Config{
@@ -72,7 +76,7 @@ func TimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 	enc.AppendString(t.Format("2006-01-02 15:04:05"))
 }
 
-func getLogger() *zap.Logger {
+func GetLogger() *zap.Logger {
 	if logger == nil {
 		newLogger()
 	}
@@ -99,22 +103,22 @@ func AddCommonField(fields []zapcore.Field) []zapcore.Field {
 
 func Info(msg string, fields ...zapcore.Field) {
 	fields = AddCommonField(fields)
-	getLogger().Info(msg, fields...)
+	GetLogger().Info(msg, fields...)
 }
 
 func Debug(msg string, fields ...zapcore.Field) {
 	fields = AddCommonField(fields)
-	getLogger().Debug(msg, fields...)
+	GetLogger().Debug(msg, fields...)
 }
 
 func Warn(msg string, fields ...zapcore.Field) {
 	fields = AddCommonField(fields)
-	getLogger().Warn(msg, fields...)
+	GetLogger().Warn(msg, fields...)
 }
 
 func Error(err string, fields ...zapcore.Field) {
 	fields = AddCommonField(fields)
-	getLogger().Error(err, fields...)
+	GetLogger().Error(err, fields...)
 }
 
 func checkAndMkdir(path string) error {

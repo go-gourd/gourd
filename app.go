@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"strconv"
 	"time"
 )
@@ -20,14 +21,28 @@ type App struct {
 	VersionName string
 	ginEngine   *gin.Engine
 	httpServer  *http.Server
-	conf        *config.AppConfig
+	Conf        *config.AppConfig
+	TempDir     string
 }
 
 func (app *App) Init() {
 
 	app.Version = 2
 	app.VersionName = "0.2.0"
-	app.conf = config.GetAppConfig()
+	app.Conf = config.GetAppConfig()
+	app.TempDir = app.Conf.TempDir
+
+	log.GetLogger()
+
+	var logo = "   _____                     _ \n" +
+		"  / ____|                   | |  Go       %s\n" +
+		" | |  __  ___  _   _ _ __ __| |  Gourd    v%s (%d)\n" +
+		" | | |_ |/ _ \\| | | | '__/ _` |  Gin      %s\n" +
+		" | |__| | (_) | |_| | | | (_| |  Log Dir  %s\n" +
+		"  \\_____|\\___/ \\__,_|_|  \\__,_|  Temp Dir %s\n" +
+		"--------------------------------------------------------\n"
+
+	fmt.Printf(logo, runtime.Version(), app.VersionName, app.Version, gin.Version, log.FilePath, app.TempDir)
 
 	//触发Boot事件
 	event.OnEvent("_boot", nil)
@@ -35,9 +50,7 @@ func (app *App) Init() {
 
 func (app *App) Create() *gin.Engine {
 
-	fmt.Println("starting...")
-
-	if app.conf.Debug {
+	if app.Conf.Debug {
 		gin.SetMode(gin.DebugMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)

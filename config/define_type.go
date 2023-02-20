@@ -1,27 +1,28 @@
 package config
 
 type AppConfig struct {
-	Name  string //应用名称
-	Debug bool   //调试模式
+	Name    string `toml:"name"`    //应用名称
+	Debug   bool   `toml:"debug"`   //调试模式
+	TempDir string `toml:"tempDir"` //调试模式
 }
 
 type HttpConfig struct {
-	Host   string // 监听域名、IP
-	Port   uint32 // 监听端口
-	Public string //静态资源目录
+	Host   string `toml:"host"`   // 监听域名、IP
+	Port   uint32 `toml:"port"`   // 监听端口
+	Public string `toml:"public"` //静态资源目录
 }
 
 type LogConfig struct {
-	Level   string //日志记录级别
-	LogFile string //日志文件
-	Console bool   //是否开启控制台输出
+	Level   string `toml:"level"`   //日志记录级别
+	LogFile string `toml:"logFile"` //日志文件
+	Console bool   `toml:"console"` //是否开启控制台输出
 }
 
 type DbConfig struct {
-	Host     string //连接地址
-	Port     int    //端口
-	User     string //用户
-	Pass     string //密码
-	Database string //数据库名
-	Param    string //连接参数
+	Host     string `toml:"host"`     //连接地址
+	Port     int    `toml:"port"`     //端口
+	User     string `toml:"user"`     //用户
+	Pass     string `toml:"pass"`     //密码
+	Database string `toml:"database"` //数据库名
+	Param    string `toml:"param"`    //连接参数
 }
