@@ -22,7 +22,7 @@ func GetEngine() *gin.Engine {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	ginEngine := gin.New()
+	ginEngine = gin.New()
 
 	return ginEngine
 }
