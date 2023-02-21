@@ -6,15 +6,12 @@ import (
 	"github.com/go-gourd/gourd/config"
 	"github.com/go-gourd/gourd/event"
 	"github.com/go-gourd/gourd/log"
-	"net/http"
 	"runtime"
 )
 
 type App struct {
 	Version     int
 	VersionName string
-	ginEngine   *gin.Engine
-	httpServer  *http.Server
 	Conf        *config.AppConfig
 	TempDir     string
 }

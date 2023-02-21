@@ -7,6 +7,7 @@ type AppConfig struct {
 }
 
 type HttpConfig struct {
+	Enable bool   `toml:"enable"` // 是否启用Http服务器
 	Host   string `toml:"host"`   // 监听域名、IP
 	Port   uint32 `toml:"port"`   // 监听端口
 	Public string `toml:"public"` //静态资源目录
