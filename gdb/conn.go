@@ -3,10 +3,10 @@ package gdb
 import (
 	"fmt"
 	"github.com/go-gourd/gourd/config"
-	gLog "github.com/go-gourd/gourd/log"
+	"github.com/go-gourd/gourd/logger"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	gormLogger "gorm.io/gorm/logger"
 	"time"
 )
 
@@ -15,7 +15,7 @@ var db *gorm.DB
 type LogWriter struct{}
 
 func (w LogWriter) Printf(format string, args ...any) {
-	gLog.GetLogger().Warn(fmt.Sprintf(format, args...))
+	logger.Errorf(format, args...)
 }
 
 // GetMysqlDb 获取Mysql连接
@@ -40,11 +40,11 @@ func GetMysqlDb() *gorm.DB {
 		slowLogTime = 60000 //默认1分钟
 	}
 
-	newLogger := logger.New(
+	newLogger := gormLogger.New(
 		LogWriter{},
-		logger.Config{
+		gormLogger.Config{
 			SlowThreshold:             time.Duration(slowLogTime) * time.Millisecond, // 慢 SQL 阈值
-			LogLevel:                  logger.Warn,                                   // 日志级别
+			LogLevel:                  gormLogger.Warn,                               // 日志级别
 			IgnoreRecordNotFoundError: true,                                          // 忽略ErrRecordNotFound（记录未找到）错误
 			Colorful:                  false,                                         // 禁用彩色打印
 		},
@@ -55,7 +55,7 @@ func GetMysqlDb() *gorm.DB {
 		Logger: newLogger,
 	})
 	if err != nil {
-		gLog.Error("cannot establish db connection: %w" + err.Error())
+		logger.Error("cannot establish db connection: %w" + err.Error())
 		panic(fmt.Errorf("cannot establish db connection: %w", err))
 	}
 

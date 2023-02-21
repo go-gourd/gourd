@@ -7,7 +7,7 @@ import (
 	"github.com/go-gourd/gourd/core"
 	"github.com/go-gourd/gourd/event"
 	"github.com/go-gourd/gourd/ghttp"
-	"github.com/go-gourd/gourd/log"
+	"github.com/go-gourd/gourd/logger"
 	"go.uber.org/zap"
 	"os"
 	"os/signal"
@@ -32,7 +32,7 @@ func (app *App) Run() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	log.Info("Shutdown Server ...", zap.Skip())
+	logger.Info("Shutdown Server ...", zap.Skip())
 
 	//触发停止事件
 	event.OnEvent("_stop", nil)
@@ -43,7 +43,7 @@ func (app *App) Run() {
 	//关闭Http服务
 	ghttp.HttpServerShutdown(ctx)
 
-	log.Info("Server exiting", zap.Skip())
+	logger.Info("Server exiting", zap.Skip())
 }
 
 // 解析并运行命令行
