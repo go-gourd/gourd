@@ -34,6 +34,7 @@ var (
 			return zapcore.NewJSONEncoder(encoderConfig)
 		},
 	}
+	MinLevel = zapcore.DebugLevel
 )
 
 type Log struct {
@@ -41,33 +42,36 @@ type Log struct {
 }
 
 type LogOptions struct {
-	// Encoding sets the logger's encoding. Valid values are "json" and
-	// "console", as well as any third-party encodings registered via
-	// RegisterEncoder.
 	Encoding      string
-	InfoFilename  string   `toml:"info_filename"`
-	ErrorFilename string   `toml:"error_filename"`
-	MaxSize       int      `toml:"max_size"`
-	MaxBackups    int      `toml:"max_backups"`
-	MaxAge        int      `toml:"max_age"`
-	Compress      bool     `toml:"compress"`
-	Division      string   `toml:"division"`
-	LevelSeparate bool     `toml:"level_separate"`
-	TimeUnit      TimeUnit `toml:"time_unit"`
-	Stacktrace    bool     `toml:"stacktrace"`
-	EncodeTime    string   `toml:"encode_time"`
+	InfoFilename  string
+	ErrorFilename string
+	MaxSize       int
+	MaxBackups    int
+	MaxAge        int
+	Compress      bool
+	Division      string
+	LevelSeparate bool
+	TimeUnit      TimeUnit
+	Stacktrace    bool
+	EncodeTime    string
 	closeDisplay  int
 	caller        bool
 }
 
 func infoLevel() zap.LevelEnablerFunc {
 	return zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		if lvl < MinLevel {
+			return false
+		}
 		return lvl < zapcore.WarnLevel
 	})
 }
 
 func warnLevel() zap.LevelEnablerFunc {
 	return zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		if lvl < MinLevel {
+			return false
+		}
 		return lvl >= zapcore.WarnLevel
 	})
 }
@@ -113,6 +117,10 @@ func (c *LogOptions) SetInfoFile(path string) {
 
 func (c *LogOptions) SetEncoding(encoding string) {
 	c.Encoding = encoding
+}
+
+func (c *LogOptions) SetMinLevel(level zapcore.Level) {
+	MinLevel = level
 }
 
 // isOutput whether set output file
@@ -322,6 +330,24 @@ func withContext(ctx context.Context) *Log {
 // Ctx new func
 func Ctx(ctx context.Context) *Log {
 	return withContext(ctx)
+}
+
+// ParseLevel 将字符串转换成枚举
+func ParseLevel(text string) zapcore.Level {
+	switch text {
+	case "debug", "DEBUG":
+		return zapcore.DebugLevel
+	case "info", "INFO", "": // make the zero value useful
+		return zapcore.InfoLevel
+	case "warn", "WARN":
+		return zapcore.WarnLevel
+	case "error", "ERROR":
+		return zapcore.ErrorLevel
+	case "fatal", "FATAL":
+		return zapcore.FatalLevel
+	default:
+		return zapcore.DebugLevel
+	}
 }
 
 func (l *Log) Info(msg string, args ...zap.Field) {
