@@ -3,6 +3,7 @@ package gourd
 import (
 	"context"
 	"fmt"
+	"github.com/go-gourd/gourd/cmd"
 	"github.com/go-gourd/gourd/config"
 	"github.com/go-gourd/gourd/core"
 	"github.com/go-gourd/gourd/event"
@@ -49,19 +50,28 @@ func (app *App) Run() {
 // 解析并运行命令行
 func consoleParse() {
 
+	//取出运行参数
 	args := os.Args
 
+	// 获取可执行文件名称
 	filenameWithSuffix := path.Base(strings.Replace(args[0], "\\", "/", -1))
-	filenameOnly := strings.TrimSuffix(filenameWithSuffix, path.Ext(filenameWithSuffix))
+	fileName := strings.TrimSuffix(filenameWithSuffix, path.Ext(filenameWithSuffix))
 
 	if len(args) == 1 {
-		fmt.Println(fmt.Sprintf(core.NoCmdHelp, filenameOnly))
+		fmt.Println(fmt.Sprintf(core.NoCmdHelp, fileName))
 		os.Exit(0)
 	}
 
-	if args[1] != "start" {
-		fmt.Println(fmt.Sprintf(core.UndefinedHelp, args[1], filenameOnly))
-		os.Exit(0)
+	// 内部命令
+	if args[1] == "start" {
+		//TODO: 暂未实现命令行接管，继续往下执行即可
+		return
 	}
+
+	// 自定义命令
+	if cmd.ExecCmd(args[1], args) != nil {
+		fmt.Println(fmt.Sprintf(core.UndefineCmddHelp, args[1], fileName))
+	}
+	os.Exit(0)
 
 }
