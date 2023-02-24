@@ -28,7 +28,13 @@ func consoleParse() {
 
 	// 内部命令
 	if args[1] == "start" {
-		//TODO: 暂未实现命令行接管，继续往下执行即可
+		//守护进程
+		if len(args) >= 3 && args[2] == "-d" {
+			fmt.Println("守护进程运行")
+			//TODO: 待实现
+		}
+
+		//暂未实现命令行接管，继续往下执行即可
 		return
 	}
 
