@@ -53,7 +53,7 @@ func consoleParse() {
 	//取出运行参数
 	args := os.Args
 
-	// 获取可执行文件名称
+	// 获取当前可执行文件名称
 	filenameWithSuffix := path.Base(strings.Replace(args[0], "\\", "/", -1))
 	fileName := strings.TrimSuffix(filenameWithSuffix, path.Ext(filenameWithSuffix))
 

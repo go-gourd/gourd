@@ -33,12 +33,12 @@ func (app *App) Init() {
 		"  / ____|                   | |  Go       %s\n" +
 		" | |  __  ___  _   _ _ __ __| |  Gourd    v%s (%d)\n" +
 		" | | |_ |/ _ \\| | | | '__/ _` |  Gin      %s\n" +
-		" | |__| | (_) | |_| | | | (_| |  Log Dir  %s\n" +
+		" | |__| | (_) | |_| | | | (_| |  Public   %s\n" +
 		"  \\_____|\\___/ \\__,_|_|  \\__,_|  Temp Dir %s\n" +
 		"--------------------------------------------------------\n"
 	fmt.Printf(
 		logo, runtime.Version(), app.VersionName, app.Version, gin.Version,
-		config.GetLogConfig().LogFile, app.TempDir,
+		config.GetHttpConfig().Public, app.TempDir,
 	)
 
 	//命令行解析

@@ -23,7 +23,7 @@ func WriteStaticFile(c *gin.Context, filepath string) error {
 	}
 	//判断文件是否存在
 	_, err := os.Stat(filepath)
-	if err == nil {
+	if err != nil {
 		return errors.New("file not exist: " + filepath)
 	}
 
