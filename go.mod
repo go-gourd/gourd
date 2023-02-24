@@ -6,6 +6,7 @@ require (
 	github.com/BurntSushi/toml v1.2.1
 	github.com/gin-gonic/gin v1.8.2
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
+	github.com/robfig/cron/v3 v3.0.1
 	go.uber.org/zap v1.24.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.4.7
