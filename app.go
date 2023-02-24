@@ -1,12 +1,18 @@
 package gourd
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-gourd/gourd/config"
 	"github.com/go-gourd/gourd/event"
+	"github.com/go-gourd/gourd/ghttp"
 	"github.com/go-gourd/gourd/logger"
+	"go.uber.org/zap"
+	"os"
+	"os/signal"
 	"runtime"
+	"time"
 )
 
 type App struct {
@@ -16,6 +22,7 @@ type App struct {
 	TempDir     string
 }
 
+// Init 初始化应用
 func (app *App) Init() {
 
 	app.Version = 2
@@ -46,26 +53,33 @@ func (app *App) Init() {
 
 }
 
-func initLogger() {
+// Run 启动应用
+func (app *App) Run() {
+	// 触发Init事件
+	event.OnEvent("_init", nil)
 
-	conf := config.GetLogConfig()
-
-	c := logger.New()
-	c.SetDivision("time")     // 设置归档方式，"time"时间归档 "size" 文件大小归档
-	c.SetTimeUnit(logger.Day) // 时间归档 可以设置切割单位
-	c.SetEncoding("json")     // 输出格式 "json" 或者 "console"
-
-	if !conf.Console {
-		c.CloseConsoleDisplay()
+	// 开启Http监听服务
+	if config.GetHttpConfig().Enable {
+		go ghttp.RunHttpServer()
 	}
 
-	c.SetInfoFile(conf.LogFile) // 设置info级别日志文件
-	if conf.LogErrorFile != "" {
-		c.SetErrorFile(conf.LogErrorFile) // 设置warn级别日志文件
-	}
+	// 触发Start事件
+	event.OnEvent("_start", nil)
 
-	//设置最低记录级别
-	c.SetMinLevel(logger.ParseLevel(conf.Level))
+	// 守护进程 -等待中断信号以优雅地关闭服务器（设置 5 秒的超时时间）
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+	logger.Info("Shutdown Server ...", zap.Skip())
 
-	c.InitLogger()
+	// 触发停止事件
+	event.OnEvent("_stop", nil)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// 关闭Http服务
+	ghttp.HttpServerShutdown(ctx)
+
+	logger.Info("Server exiting", zap.Skip())
 }
