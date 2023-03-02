@@ -8,6 +8,7 @@ import (
 	"github.com/go-gourd/gourd/logger"
 	"os"
 	"path"
+	"runtime"
 	"strings"
 )
 
@@ -30,8 +31,15 @@ func consoleParse() {
 	if args[1] == "start" {
 		//守护进程
 		if len(args) >= 3 && args[2] == "-d" {
-			fmt.Println("守护进程运行")
-			//TODO: 待实现
+			if runtime.GOOS == "windows" {
+				//守护进程模式暂不支持windows
+				fmt.Println("Warn: The daemon does not support Windows.")
+			} else {
+
+				//守护进程，成功后会终止当前应用
+				core.DaemonRun()
+
+			}
 		}
 
 		//暂未实现命令行接管，继续往下执行即可
