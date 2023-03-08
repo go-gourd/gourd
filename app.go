@@ -30,6 +30,13 @@ func (app *App) Init() {
 	app.Conf = config.GetAppConfig()
 	app.TempDir = app.Conf.TempDir
 
+	//创建TempDir
+	err := os.MkdirAll(app.TempDir, os.ModePerm)
+	if err != nil {
+		logger.Errorf("Mkdir TempDir Err:%s", err.Error())
+		panic(err)
+	}
+
 	//初始化日志工具
 	initLogger()
 
@@ -48,9 +55,6 @@ func (app *App) Init() {
 		config.GetHttpConfig().Public, app.TempDir,
 	)
 
-	//命令行解析
-	consoleParse()
-
 }
 
 // Run 启动应用
@@ -58,10 +62,8 @@ func (app *App) Run() {
 	// 触发Init事件
 	event.OnEvent("_init", nil)
 
-	// 开启Http监听服务
-	if config.GetHttpConfig().Enable {
-		go ghttp.RunHttpServer()
-	}
+	//命令行解析
+	consoleParse()
 
 	// 触发Start事件
 	event.OnEvent("_start", nil)

@@ -5,6 +5,7 @@ import (
 	"github.com/go-gourd/gourd/cmd"
 	"github.com/go-gourd/gourd/config"
 	"github.com/go-gourd/gourd/core"
+	"github.com/go-gourd/gourd/ghttp"
 	"github.com/go-gourd/gourd/logger"
 	"os"
 	"path"
@@ -35,23 +36,27 @@ func consoleParse() {
 				//守护进程模式暂不支持windows
 				fmt.Println("Warn: The daemon does not support Windows.")
 			} else {
-
 				//守护进程，成功后会终止当前应用
 				core.DaemonRun()
 
+				logger.Info("Daemon Running")
+				os.Exit(0)
 			}
 		}
 
-		//暂未实现命令行接管，继续往下执行即可
+		// 开启Http监听服务
+		if config.GetHttpConfig().Enable {
+			go ghttp.RunHttpServer()
+		}
+
 		return
 	}
 
-	// 自定义命令
-	if cmd.ExecCmd(args[1], args) != nil {
+	// 其他自定义命令
+	if cmd.Exec(args[1], args) != nil {
 		fmt.Println(fmt.Sprintf(core.UndefineCmddHelp, args[1], fileName))
 	}
 	os.Exit(0)
-
 }
 
 func initLogger() {
