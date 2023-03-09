@@ -38,8 +38,7 @@ func consoleParse() {
 			} else {
 				//守护进程，成功后会终止当前应用
 				core.DaemonRun()
-
-				logger.Info("Daemon Running")
+				logger.Info("Daemon Running...")
 				os.Exit(0)
 			}
 		}

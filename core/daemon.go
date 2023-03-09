@@ -5,16 +5,18 @@ import (
 	"github.com/sevlyar/go-daemon"
 	"log"
 	"os"
+	"strconv"
 )
 
 // DaemonRun 守护进程模式运行
 func DaemonRun() {
 
 	tempDir := config.GetAppConfig().TempDir
+	pidFile := tempDir + "/daemon.pid"
 
 	ctx := &daemon.Context{
-		PidFileName: tempDir + "/daemon.pid",
-		PidFilePerm: 0644,
+		//PidFileName: tempDir + "/daemon.pid",
+		//PidFilePerm: 0644,
 		LogFileName: tempDir + "/daemon.log",
 		LogFilePerm: 0640,
 		WorkDir:     "./",
@@ -27,7 +29,7 @@ func DaemonRun() {
 		log.Fatal("Unable to run: ", err)
 	}
 	if d != nil {
-		return
+		_ = os.WriteFile(pidFile, []byte(strconv.Itoa(d.Pid)), 0666) //写入文件(字节数组)
+		_ = ctx.Release()
 	}
-	defer ctx.Release()
 }
