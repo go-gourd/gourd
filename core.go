@@ -34,11 +34,12 @@ func consoleParse() {
 		if len(args) >= 3 && args[2] == "-d" {
 			if runtime.GOOS == "windows" {
 				//守护进程模式暂不支持windows
-				fmt.Println("Warn: The daemon does not support Windows.")
+				fmt.Println("[Warn] The daemon does not support Windows.")
 			} else {
 				//守护进程，成功后会终止当前应用
 				core.DaemonRun()
 				logger.Info("Daemon Running...")
+				fmt.Println("[Info] Daemon Running...")
 				os.Exit(0)
 			}
 		}
@@ -49,11 +50,17 @@ func consoleParse() {
 		}
 
 		return
+	} else if args[1] == "stop" {
+		//停止后台进程
+		core.StopDaemonProcess()
+		logger.Info("Daemon Process Stopped.")
+		fmt.Println("[Info] Daemon Process Stopped.")
+		return
 	}
 
 	// 其他自定义命令
 	if cmd.Exec(args[1], args) != nil {
-		fmt.Println(fmt.Sprintf(core.UndefineCmddHelp, args[1], fileName))
+		fmt.Println(fmt.Sprintf(core.UndefinedCmdHelp, args[1], fileName))
 	}
 	os.Exit(0)
 }
