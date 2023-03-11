@@ -20,7 +20,7 @@ type LogConfig struct {
 	Console      bool   `toml:"console"`      //是否开启控制台输出
 }
 
-type DbConfig struct {
+type DbConfigType struct {
 	Host        string `toml:"host"`        //连接地址
 	Port        int    `toml:"port"`        //端口
 	User        string `toml:"user"`        //用户
@@ -29,3 +29,6 @@ type DbConfig struct {
 	Param       string `toml:"param"`       //连接参数
 	SlowLogTime int    `toml:"slowLogTime"` //慢日志阈值（毫秒）0为不开启
 }
+
+// DbConfig 适用于多个连接的配置
+type DbConfig map[string]DbConfigType

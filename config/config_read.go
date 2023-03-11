@@ -81,12 +81,12 @@ func GetHttpConfig() *HttpConfig {
 	return &httpConfig
 }
 
-func GetDbConfig() *DbConfig {
+func GetDbConfig() DbConfig {
 	name := "database"
 
 	//已存在 -返回
 	if _, ok := initState[name]; ok {
-		return &dbConfig
+		return dbConfig
 	}
 
 	var tomlData, err = readConfigFile(name)
@@ -101,7 +101,7 @@ func GetDbConfig() *DbConfig {
 
 	//已加载
 	initState[name] = true
-	return &dbConfig
+	return dbConfig
 }
 
 func readConfigFile(name string) (string, error) {
