@@ -21,6 +21,7 @@ type LogConfig struct {
 }
 
 type DbConfigType struct {
+	Type        string `toml:"type"`        //数据库类型
 	Host        string `toml:"host"`        //连接地址
 	Port        int    `toml:"port"`        //端口
 	User        string `toml:"user"`        //用户
