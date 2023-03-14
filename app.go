@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/go-gourd/gourd/cmd"
 	"github.com/go-gourd/gourd/config"
+	"github.com/go-gourd/gourd/core"
 	"github.com/go-gourd/gourd/event"
 	"github.com/go-gourd/gourd/ghttp"
 	"github.com/go-gourd/gourd/logger"
@@ -38,7 +40,7 @@ func (app *App) Init() {
 	}
 
 	//初始化日志工具
-	initLogger()
+	core.InitLogger()
 
 	//触发Boot事件
 	event.OnEvent("_boot", nil)
@@ -63,7 +65,7 @@ func (app *App) Run() {
 	event.OnEvent("_init", nil)
 
 	//命令行解析
-	consoleParse()
+	cmd.ConsoleParse()
 
 	// 触发Start事件
 	event.OnEvent("_start", nil)
