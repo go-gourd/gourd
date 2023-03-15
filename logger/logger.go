@@ -3,7 +3,7 @@ package logger
 import (
 	"context"
 	"fmt"
-	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	"github.com/go-gourd/gourd/logger/rotatelogs"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -268,32 +268,32 @@ func Fatal(msg string, args ...zap.Field) {
 	Logger.L.Fatal(msg, args...)
 }
 
-func Infof(format string, args ...interface{}) {
+func Infof(format string, args ...any) {
 	logMsg := fmt.Sprintf(format, args...)
 	Logger.L.Info(logMsg)
 }
 
-func Errorf(format string, args ...interface{}) {
+func Errorf(format string, args ...any) {
 	logMsg := fmt.Sprintf(format, args...)
 	Logger.L.Error(logMsg)
 }
 
-func Warnf(format string, args ...interface{}) {
+func Warnf(format string, args ...any) {
 	logMsg := fmt.Sprintf(format, args...)
 	Logger.L.Warn(logMsg)
 }
 
-func Debugf(format string, args ...interface{}) {
+func Debugf(format string, args ...any) {
 	logMsg := fmt.Sprintf(format, args...)
 	Logger.L.Debug(logMsg)
 }
 
-func Fatalf(format string, args ...interface{}) {
+func Fatalf(format string, args ...any) {
 	logMsg := fmt.Sprintf(format, args...)
 	Logger.L.Fatal(logMsg)
 }
 
-func With(k string, v interface{}) zap.Field {
+func With(k string, v any) zap.Field {
 	return zap.Any(k, v)
 }
 
@@ -370,27 +370,27 @@ func (l *Log) Fatal(msg string, args ...zap.Field) {
 	l.L.Fatal(msg, args...)
 }
 
-func (l *Log) Infof(format string, args ...interface{}) {
+func (l *Log) Infof(format string, args ...any) {
 	logMsg := fmt.Sprintf(format, args...)
 	l.L.Info(logMsg)
 }
 
-func (l *Log) Errorf(format string, args ...interface{}) {
+func (l *Log) Errorf(format string, args ...any) {
 	logMsg := fmt.Sprintf(format, args...)
 	l.L.Error(logMsg)
 }
 
-func (l *Log) Warnf(format string, args ...interface{}) {
+func (l *Log) Warnf(format string, args ...any) {
 	logMsg := fmt.Sprintf(format, args...)
 	l.L.Warn(logMsg)
 }
 
-func (l *Log) Debugf(format string, args ...interface{}) {
+func (l *Log) Debugf(format string, args ...any) {
 	logMsg := fmt.Sprintf(format, args...)
 	l.L.Debug(logMsg)
 }
 
-func (l *Log) Fatalf(format string, args ...interface{}) {
+func (l *Log) Fatalf(format string, args ...any) {
 	logMsg := fmt.Sprintf(format, args...)
 	l.L.Fatal(logMsg)
 }
