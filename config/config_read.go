@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/BurntSushi/toml"
+	"github.com/pelletier/go-toml/v2"
 	"os"
 )
 
@@ -25,7 +25,7 @@ func GetAppConfig() *AppConfig {
 		panic(err)
 	}
 
-	_, err = toml.Decode(tomlData, &appConfig)
+	err = toml.Unmarshal(tomlData, &appConfig)
 	if err != nil {
 		panic(err)
 	}
@@ -48,7 +48,7 @@ func GetLogConfig() *LogConfig {
 		panic(err)
 	}
 
-	_, err = toml.Decode(tomlData, &logConfig)
+	err = toml.Unmarshal(tomlData, &logConfig)
 	if err != nil {
 		panic(err)
 	}
@@ -71,7 +71,7 @@ func GetHttpConfig() *HttpConfig {
 		panic(err)
 	}
 
-	_, err = toml.Decode(tomlData, &httpConfig)
+	err = toml.Unmarshal(tomlData, &httpConfig)
 	if err != nil {
 		panic(err)
 	}
@@ -94,7 +94,7 @@ func GetDbConfig() DbConfig {
 		panic(err)
 	}
 
-	_, err = toml.Decode(tomlData, &dbConfig)
+	err = toml.Unmarshal(tomlData, &dbConfig)
 	if err != nil {
 		panic(err)
 	}
@@ -104,11 +104,11 @@ func GetDbConfig() DbConfig {
 	return dbConfig
 }
 
-func readConfigFile(name string) (string, error) {
+func readConfigFile(name string) ([]byte, error) {
 	var file = "./config/" + name + ".toml"
 	f, err := os.ReadFile(file)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return string(f), nil
+	return f, nil
 }
