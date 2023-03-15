@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/go-gourd/gourd/config"
 	"github.com/go-gourd/gourd/core"
-	"github.com/go-gourd/gourd/ghttp"
+	"github.com/go-gourd/gourd/event"
 	"github.com/go-gourd/gourd/logger"
 	"os"
 	"path"
@@ -91,7 +91,7 @@ func coreCmdExec(args []string) bool {
 
 		// 开启Http监听服务
 		if config.GetHttpConfig().Enable {
-			go ghttp.RunHttpServer()
+			event.Trigger("_http_start", nil)
 		}
 		return false
 	case "stop":

@@ -4,8 +4,8 @@ type HandlerEvent func(params any)
 
 var event = make(map[string][]HandlerEvent)
 
-// AddEvent 添加事件
-func AddEvent(name string, callback HandlerEvent) {
+// Listen 监听事件
+func Listen(name string, callback HandlerEvent) {
 	if _, ok := event[name]; ok {
 		event[name] = append(event[name], callback)
 	} else {
@@ -15,8 +15,8 @@ func AddEvent(name string, callback HandlerEvent) {
 	}
 }
 
-// OnEvent 触发事件
-func OnEvent(name string, params any) {
+// Trigger 触发事件
+func Trigger(name string, params any) {
 	if _, ok := event[name]; !ok {
 		return
 	}

@@ -3,17 +3,16 @@ package gourd
 import (
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"github.com/go-gourd/gourd/cmd"
 	"github.com/go-gourd/gourd/config"
 	"github.com/go-gourd/gourd/core"
 	"github.com/go-gourd/gourd/event"
-	"github.com/go-gourd/gourd/ghttp"
 	"github.com/go-gourd/gourd/logger"
 	"go.uber.org/zap"
 	"os"
 	"os/signal"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -43,18 +42,21 @@ func (app *App) Init() {
 	core.InitLogger()
 
 	//触发Boot事件
-	event.OnEvent("_boot", nil)
+	event.Trigger("_boot", nil)
 
 	var logo = "   _____                     _ \n" +
 		"  / ____|                   | |  Go       %s\n" +
 		" | |  __  ___  _   _ _ __ __| |  Gourd    v%s (%d)\n" +
-		" | | |_ |/ _ \\| | | | '__/ _` |  Gin      %s\n" +
-		" | |__| | (_) | |_| | | | (_| |  Public   %s\n" +
-		"  \\_____|\\___/ \\__,_|_|  \\__,_|  Temp Dir %s\n" +
+		" | | |_ |/ _ \\| | | | '__/ _` |  Public   %s\n" +
+		" | |__| | (_) | |_| | | | (_| |  Temp Dir %s\n" +
+		"  \\_____|\\___/ \\__,_|_|  \\__,_|  Log Dir %s\n" +
 		"--------------------------------------------------------\n"
+
+	logFile := config.GetLogConfig().LogFile
+	logDirIndex := strings.LastIndex(logFile, "/")
 	fmt.Printf(
-		logo, runtime.Version(), app.VersionName, app.Version, gin.Version,
-		config.GetHttpConfig().Public, app.TempDir,
+		logo, runtime.Version(), app.VersionName, app.Version,
+		config.GetHttpConfig().Public, app.TempDir, logFile[:logDirIndex],
 	)
 
 }
@@ -62,13 +64,13 @@ func (app *App) Init() {
 // Run 启动应用
 func (app *App) Run() {
 	// 触发Init事件
-	event.OnEvent("_init", nil)
+	event.Trigger("_init", nil)
 
 	//命令行解析
 	cmd.ConsoleParse()
 
 	// 触发Start事件
-	event.OnEvent("_start", nil)
+	event.Trigger("_start", nil)
 
 	// 守护进程 -等待中断信号以优雅地关闭服务器（设置 5 秒的超时时间）
 	quit := make(chan os.Signal)
@@ -76,14 +78,11 @@ func (app *App) Run() {
 	<-quit
 	logger.Info("Shutdown Server ...", zap.Skip())
 
-	// 触发停止事件
-	event.OnEvent("_stop", nil)
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// 关闭Http服务
-	ghttp.HttpServerShutdown(ctx)
+	// 触发停止事件
+	event.Trigger("_stop", ctx)
 
 	logger.Info("Server exiting", zap.Skip())
 }
