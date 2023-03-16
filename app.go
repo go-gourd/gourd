@@ -21,6 +21,7 @@ type App struct {
 	VersionName string
 	Conf        *config.AppConfig
 	TempDir     string
+	DisableLogo bool
 }
 
 // Init 初始化应用
@@ -41,23 +42,25 @@ func (app *App) Init() {
 	//初始化日志工具
 	core.InitLogger()
 
+	if !app.DisableLogo {
+		var logo = "   _____                     _ \n" +
+			"  / ____|                   | |  Go       %s\n" +
+			" | |  __  ___  _   _ _ __ __| |  Gourd    v%s (%d)\n" +
+			" | | |_ |/ _ \\| | | | '__/ _` |  Public   %s\n" +
+			" | |__| | (_) | |_| | | | (_| |  Temp Dir %s\n" +
+			"  \\_____|\\___/ \\__,_|_|  \\__,_|  Log Dir %s\n" +
+			"--------------------------------------------------------\n"
+
+		logFile := config.GetLogConfig().LogFile
+		logDirIndex := strings.LastIndex(logFile, "/")
+		fmt.Printf(
+			logo, runtime.Version(), app.VersionName, app.Version,
+			config.GetHttpConfig().Public, app.TempDir, logFile[:logDirIndex],
+		)
+	}
+
 	//触发Boot事件
 	event.Trigger("_boot", nil)
-
-	var logo = "   _____                     _ \n" +
-		"  / ____|                   | |  Go       %s\n" +
-		" | |  __  ___  _   _ _ __ __| |  Gourd    v%s (%d)\n" +
-		" | | |_ |/ _ \\| | | | '__/ _` |  Public   %s\n" +
-		" | |__| | (_) | |_| | | | (_| |  Temp Dir %s\n" +
-		"  \\_____|\\___/ \\__,_|_|  \\__,_|  Log Dir %s\n" +
-		"--------------------------------------------------------\n"
-
-	logFile := config.GetLogConfig().LogFile
-	logDirIndex := strings.LastIndex(logFile, "/")
-	fmt.Printf(
-		logo, runtime.Version(), app.VersionName, app.Version,
-		config.GetHttpConfig().Public, app.TempDir, logFile[:logDirIndex],
-	)
 
 }
 
