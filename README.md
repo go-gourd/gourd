@@ -38,19 +38,22 @@ go run main.go
 ```text
    _____                     _ 
   / ____|                   | |  Go       go1.20
- | |  __  ___  _   _ _ __ __| |  Gourd    v0.2.1 (3)
+ | |  __  ___  _   _ _ __ __| |  Gourd    v0.2.7 (9)
  | | |_ |/ _ \| | | | '__/ _` |  Gin      v1.8.2
  | |__| | (_) | |_| | | | (_| |  Public   ./public
   \_____|\___/ \__,_|_|  \__,_|  Temp Dir ./runtime
 --------------------------------------------------------
 {"level":"info","time":"2023-02 *","msg":"Started http server. :8888"}
 ```
-运行成功，使用浏览器访问`http://localhsot/`
+运行成功，使用浏览器访问`http://localhsot:8888/`
+
+## 参考文档
+
+https://github.com/go-gourd/gourd-app/wiki
 
 ## 参与开发
 
 直接提交PR或者Issue即可
-
 ## 版权信息
 
 项目遵循Apache2开源协议发布，提供免费使用，项目包含的第三方源码和二进制文件之版权信息另行标注。
