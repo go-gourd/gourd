@@ -1,6 +1,7 @@
 package cron
 
 import (
+	"github.com/go-gourd/gourd/event"
 	"github.com/robfig/cron/v3"
 )
 
@@ -23,8 +24,11 @@ func Init() {
 	}
 	c = cron.New()
 
-	// 开始执行（每个任务会在自己的 goroutine 中执行）
-	c.Start()
+	//系统启动
+	event.Listen("_start", func(_ any) {
+		// 开始执行（每个任务会在自己的 goroutine 中执行）
+		c.Start()
+	})
 }
 
 // Add 添加一个定时任务
