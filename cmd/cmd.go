@@ -21,9 +21,16 @@ type Commend struct {
 
 var cmdList = make(map[string]Commend)
 
+var defaultCmd *Commend
+
 // Add 添加命令行
 func Add(cmd Commend) {
 	cmdList[cmd.Name] = cmd
+}
+
+// SetDefault 设置默认执行命令 -无任何参数的清情况下
+func SetDefault(cmd Commend) {
+	defaultCmd = &cmd
 }
 
 // Exec 执行命令行（由框架完成此操作）
@@ -54,8 +61,14 @@ func ConsoleParse() {
 	fileName := strings.TrimSuffix(filenameWithSuffix, path.Ext(filenameWithSuffix))
 
 	if len(args) == 1 {
-		fmt.Println(fmt.Sprintf(core.NoCmdHelp, fileName))
-		os.Exit(0)
+		if defaultCmd == nil {
+			fmt.Println(fmt.Sprintf(core.NoCmdHelp, fileName))
+			os.Exit(0)
+		}
+
+		//执行默认命令
+		defaultCmd.Handler(args)
+		return
 	}
 
 	// 解析执行命令行
