@@ -7,10 +7,17 @@ import (
 
 var initState = make(map[string]bool)
 
+var configDir = "./config"
+
 var appConfig AppConfig
 var logConfig LogConfig
 var httpConfig HttpConfig
 var dbConfig DbConfig
+
+// SetConfigDir 设置配置文件目录
+func SetConfigDir(path string) {
+	configDir = path
+}
 
 func GetAppConfig() *AppConfig {
 	name := "app"
@@ -105,7 +112,7 @@ func GetDbConfig() DbConfig {
 }
 
 func readConfigFile(name string) ([]byte, error) {
-	var file = "./config/" + name + ".toml"
+	var file = configDir + "/" + name + ".toml"
 	f, err := os.ReadFile(file)
 	if err != nil {
 		return nil, err
