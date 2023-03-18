@@ -62,7 +62,7 @@ func ConsoleParse() {
 
 	if len(args) == 1 {
 		if defaultCmd == nil {
-			fmt.Println(fmt.Sprintf(core.NoCmdHelp, fileName))
+			fmt.Print(fmt.Sprintf(core.NoCmdHelp, fileName) + getCmdListHelps())
 			os.Exit(0)
 		}
 
@@ -74,7 +74,7 @@ func ConsoleParse() {
 	// 解析执行命令行
 	err := Exec(args[1], args)
 	if err != nil {
-		fmt.Println(fmt.Sprintf(core.UndefinedCmdHelp, args[1], fileName))
+		fmt.Print(fmt.Sprintf(core.UndefinedCmdHelp, args[1], fileName) + getCmdListHelps())
 		os.Exit(0)
 	}
 }
@@ -117,4 +117,13 @@ func coreCmdExec(args []string) bool {
 	}
 
 	return true
+}
+
+// 获取所有自定义命令提示
+func getCmdListHelps() string {
+	str := ""
+	for _, cmd := range cmdList {
+		str += fmt.Sprintf("  %-7s  %s\n", cmd.Name, cmd.Explain)
+	}
+	return str
 }

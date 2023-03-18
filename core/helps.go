@@ -2,10 +2,10 @@ package core
 
 const cmd = `
 Commands:
-  start    Start process.
-	-d     Daemon process.
-  restart  Restart daemon process.
-  stop     Stop daemon process.
+  start    Start app
+   -d  Daemon process
+  restart  Restart daemon process
+  stop     Stop daemon process
 `
 
 const NoCmdHelp = `Welcome To Go-Gourd Command Console!
