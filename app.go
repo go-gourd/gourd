@@ -27,8 +27,8 @@ type App struct {
 // Init 初始化应用
 func (app *App) Init() {
 
-	app.Version = 9
-	app.VersionName = "0.2.7"
+	app.Version = 10
+	app.VersionName = "0.2.8"
 	app.Conf = config.GetAppConfig()
 	app.TempDir = app.Conf.TempDir
 
