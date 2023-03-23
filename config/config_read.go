@@ -27,7 +27,7 @@ func GetAppConfig() *AppConfig {
 		return &appConfig
 	}
 
-	var tomlData, err = readConfigFile(name)
+	var tomlData, err = ReadFile(name)
 	if err != nil {
 		panic(err)
 	}
@@ -50,7 +50,7 @@ func GetLogConfig() *LogConfig {
 		return &logConfig
 	}
 
-	var tomlData, err = readConfigFile(name)
+	var tomlData, err = ReadFile(name)
 	if err != nil {
 		panic(err)
 	}
@@ -73,7 +73,7 @@ func GetHttpConfig() *HttpConfig {
 		return &httpConfig
 	}
 
-	var tomlData, err = readConfigFile(name)
+	var tomlData, err = ReadFile(name)
 	if err != nil {
 		panic(err)
 	}
@@ -96,7 +96,7 @@ func GetDbConfig() DbConfig {
 		return dbConfig
 	}
 
-	var tomlData, err = readConfigFile(name)
+	var tomlData, err = ReadFile(name)
 	if err != nil {
 		panic(err)
 	}
@@ -111,7 +111,21 @@ func GetDbConfig() DbConfig {
 	return dbConfig
 }
 
-func readConfigFile(name string) ([]byte, error) {
+// Unmarshal 读取自定义配置文件
+func Unmarshal(name string, v any) error {
+	var tomlData, err = ReadFile(name)
+	if err != nil {
+		return err
+	}
+
+	err = toml.Unmarshal(tomlData, v)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func ReadFile(name string) ([]byte, error) {
 	var file = configDir + "/" + name + ".toml"
 	f, err := os.ReadFile(file)
 	if err != nil {
