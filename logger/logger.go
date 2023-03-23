@@ -59,21 +59,21 @@ type LogOptions struct {
 }
 
 func infoLevel() zap.LevelEnablerFunc {
-	return zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+	return func(lvl zapcore.Level) bool {
 		if lvl < MinLevel {
 			return false
 		}
 		return lvl < zapcore.WarnLevel
-	})
+	}
 }
 
 func warnLevel() zap.LevelEnablerFunc {
-	return zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+	return func(lvl zapcore.Level) bool {
 		if lvl < MinLevel {
 			return false
 		}
 		return lvl >= zapcore.WarnLevel
-	})
+	}
 }
 
 func New() *LogOptions {
