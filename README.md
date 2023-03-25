@@ -2,7 +2,20 @@
 Gourd 0.2 Beta 2023
 ===============
 
-Go-Gourd 是一个由事件驱动的快速开发框架，高度集成且灵活易用。
+[![Go Report Card](https://goreportcard.com/badge/github.com/go-gourd/gourd)](https://goreportcard.com/report/github.com/go-gourd/gourd)
+[![GoDoc](https://pkg.go.dev/badge/github.com/go-gourd/gourd?status.svg)](https://pkg.go.dev/github.com/go-gourd/gourd?tab=doc)
+[![Sourcegraph](https://sourcegraph.com/github.com/go-gourd/gourd/-/badge.svg)](https://sourcegraph.com/github.com/go-gourd/gourd?badge)
+[![Release](https://img.shields.io/github/release/go-gourd/gourd.svg?style=flat-square)](https://github.com/go-gourd/gourd/releases)
+
+```text
+   _____                     _
+  / ____|                   | |  Go       go1.20
+ | |  __  ___  _   _ _ __ __| |  Gourd    v0.2.9 (11)
+ | | |_ |/ _ \| | | | '__/ _` |  Public   ./public
+ | |__| | (_) | |_| | | | (_| |  Temp Dir ./runtime
+  \_____|\___/ \__,_|_|  \__,_|  Log Dir  ./runtime/log
+```
+> Go-Gourd 是一个由事件驱动的快速开发框架，高度集成且灵活易用。
 
 ## 框架由来
 我正在学习Golang，是一名PHP开发者，学习过程中发现Go在很多地方对于php开发习惯很不友好。  
@@ -34,17 +47,6 @@ go mod tidy
 go run main.go
 ```
 
-等待控制台输出
-```text
-   _____                     _ 
-  / ____|                   | |  Go       go1.20
- | |  __  ___  _   _ _ __ __| |  Gourd    v0.2.7 (9)
- | | |_ |/ _ \| | | | '__/ _` |  Gin      v1.8.2
- | |__| | (_) | |_| | | | (_| |  Public   ./public
-  \_____|\___/ \__,_|_|  \__,_|  Temp Dir ./runtime
---------------------------------------------------------
-{"level":"info","time":"2023-02 *","msg":"Started http server. :8888"}
-```
 运行成功，使用浏览器访问`http://localhsot:8888/`
 
 ## 参考文档
