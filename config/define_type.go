@@ -4,6 +4,7 @@ type AppConfig struct {
 	Name    string `toml:"name"`    //应用名称
 	Debug   bool   `toml:"debug"`   //调试模式
 	TempDir string `toml:"tempDir"` //调试模式
+	Version string `toml:"version"` //版本号
 }
 
 type HttpConfig struct {
