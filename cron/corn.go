@@ -29,13 +29,16 @@ func Init() {
 		// 开始执行（每个任务会在自己的 goroutine 中执行）
 		c.Start()
 	})
+
+	// 使用携程启动
+	go c.Run()
 }
 
 // Add 添加一个定时任务
 func Add(spec string, cmd func()) error {
 	Init()
 
-	c.Run()
+	// 开始执行（每个任务会在自己的 goroutine 中执行）
 	_, err := c.AddFunc(spec, cmd)
 	return err
 }
