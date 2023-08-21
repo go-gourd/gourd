@@ -6,7 +6,7 @@ import (
 	"github.com/go-gourd/gourd/config"
 	"github.com/go-gourd/gourd/core"
 	"github.com/go-gourd/gourd/event"
-	"github.com/go-gourd/gourd/logger"
+	"github.com/go-gourd/gourd/log"
 	"os"
 	"path"
 	"runtime"
@@ -96,7 +96,7 @@ func coreCmdExec(args []string) bool {
 			} else {
 				//守护进程，成功后会终止当前应用
 				core.DaemonRun()
-				logger.Info("Daemon Running...")
+				log.Info("Daemon Running...")
 				fmt.Println("[Info] Daemon Running...")
 				os.Exit(0)
 			}
@@ -110,7 +110,7 @@ func coreCmdExec(args []string) bool {
 	case "stop":
 		//停止后台进程
 		core.StopDaemonProcess()
-		logger.Info("Daemon Process Stopped.")
+		log.Info("Daemon Process Stopped.")
 		fmt.Println("[Info] Daemon Process Stopped.")
 		os.Exit(0)
 		return false
