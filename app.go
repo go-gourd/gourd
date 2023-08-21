@@ -5,15 +5,20 @@ import (
 	"fmt"
 	"github.com/go-gourd/gourd/cmd"
 	"github.com/go-gourd/gourd/config"
-	"github.com/go-gourd/gourd/core"
 	"github.com/go-gourd/gourd/event"
-	"github.com/go-gourd/gourd/logger"
+	"github.com/go-gourd/gourd/log"
 	"go.uber.org/zap"
 	"os"
 	"os/signal"
 	"runtime"
 	"strings"
 	"time"
+)
+
+// 版本信息
+const (
+	VersionNum  = 13
+	VersionName = "0.3.0"
 )
 
 type App struct {
@@ -27,31 +32,32 @@ type App struct {
 // Init 初始化应用
 func (app *App) Init() {
 
-	app.Version = 12
-	app.VersionName = "0.2.10"
 	app.Conf = config.GetAppConfig()
 	app.TempDir = app.Conf.TempDir
+
+	//版本显示
+	if app.VersionName != "" {
+		app.Version = VersionNum
+		app.VersionName = VersionName
+	}
 
 	//创建TempDir
 	err := os.MkdirAll(app.TempDir, os.ModePerm)
 	if err != nil {
-		logger.Errorf("Mkdir TempDir Err:%s", err.Error())
+		log.Errorf("Mkdir TempDir Err:%s", err.Error())
 		panic(err)
 	}
-
-	//初始化日志工具
-	core.InitLogger()
 
 	if !app.DisableLogo {
 		var logo = "   _____                     _ \n" +
 			"  / ____|                   | |  Go       %s\n" +
-			" | |  __  ___  _   _ _ __ __| |  Gourd    v%s (%d)\n" +
+			" | |  __  ___  _   _ _ __ __| |  App      v%s (%d)\n" +
 			" | | |_ |/ _ \\| | | | '__/ _` |  Public   %s\n" +
 			" | |__| | (_) | |_| | | | (_| |  Temp Dir %s\n" +
 			"  \\_____|\\___/ \\__,_|_|  \\__,_|  Log Dir  %s\n" +
 			"--------------------------------------------------------\n"
 
-		logFile := config.GetLogConfig().LogFile
+		logFile := "log.Config.LogFile"
 		logDirIndex := strings.LastIndex(logFile, "/")
 		fmt.Printf(
 			logo, runtime.Version(), app.VersionName, app.Version,
@@ -79,7 +85,7 @@ func (app *App) Run() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	logger.Info("Shutdown Server ...", zap.Skip())
+	log.Info("Shutdown Server ...", zap.Skip())
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -87,5 +93,5 @@ func (app *App) Run() {
 	// 触发停止事件
 	event.Trigger("_stop", ctx)
 
-	logger.Info("Server exiting", zap.Skip())
+	log.Info("Server exiting", zap.Skip())
 }

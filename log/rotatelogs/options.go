@@ -1,7 +1,7 @@
 package rotatelogs
 
 import (
-	"github.com/go-gourd/gourd/logger/rotatelogs/internal/option"
+	"github.com/go-gourd/gourd/log/rotatelogs/internal/option"
 	"time"
 )
 
