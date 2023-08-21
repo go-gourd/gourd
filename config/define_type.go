@@ -14,6 +14,13 @@ type HttpConfig struct {
 	Public string `toml:"public"` //静态资源目录
 }
 
+type LogConfig struct {
+	Level        string `toml:"level"`        //日志记录级别
+	LogFile      string `toml:"logFile"`      //日志文件
+	LogErrorFile string `toml:"logErrorFile"` //错误日志文件 -默认不独立存放
+	Console      bool   `toml:"console"`      //是否开启控制台输出
+}
+
 type DbConfigType struct {
 	Type        string `toml:"type"`        //数据库类型
 	Host        string `toml:"host"`        //连接地址

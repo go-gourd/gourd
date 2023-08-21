@@ -56,7 +56,7 @@ func (app *App) Init() {
 			"  \\_____|\\___/ \\__,_|_|  \\__,_|  Log Dir  %s\n" +
 			"--------------------------------------------------------\n"
 
-		logFile := "log.Config.LogFile"
+		logFile := config.GetLogConfig().LogFile
 		logDirIndex := strings.LastIndex(logFile, "/")
 		fmt.Printf(
 			logo, runtime.Version(), app.VersionName, app.Version,

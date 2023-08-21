@@ -10,6 +10,7 @@ var initState = make(map[string]bool)
 var configDir = "./config"
 
 var appConfig AppConfig
+var logConfig LogConfig
 var httpConfig HttpConfig
 var dbConfig DbConfig
 
@@ -39,6 +40,29 @@ func GetAppConfig() *AppConfig {
 	//已加载
 	initState[name] = true
 	return &appConfig
+}
+
+func GetLogConfig() *LogConfig {
+	name := "log"
+
+	//已存在 -返回
+	if _, ok := initState[name]; ok {
+		return &logConfig
+	}
+
+	var tomlData, err = ReadFile(name)
+	if err != nil {
+		panic(err)
+	}
+
+	err = toml.Unmarshal(tomlData, &logConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	//已加载
+	initState[name] = true
+	return &logConfig
 }
 
 func GetHttpConfig() *HttpConfig {
