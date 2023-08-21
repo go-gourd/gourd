@@ -26,7 +26,7 @@ const (
 )
 
 var (
-	L                         *Log
+	Logger                    *Log
 	_encoderNameToConstructor = map[string]func(zapcore.EncoderConfig) zapcore.Encoder{
 		"console": func(encoderConfig zapcore.EncoderConfig) zapcore.Encoder {
 			return zapcore.NewConsoleEncoder(encoderConfig)
@@ -36,12 +36,11 @@ var (
 		},
 	}
 	MinLevel = zapcore.DebugLevel
-	opt      *Options
-	Config   *logConfig
+	isInit   = false
 )
 
 type Log struct {
-	Logger *zap.Logger
+	L *zap.Logger
 }
 
 type Options struct {
@@ -61,6 +60,43 @@ type Options struct {
 	caller        bool
 }
 
+// 初始化日志工具
+func initLogger() {
+
+	if isInit {
+		return
+	}
+
+	conf := config.GetLogConfig()
+
+	c := &Options{
+		Division:      _defaultDivision,
+		LevelSeparate: false,
+		TimeUnit:      _defaultUnit,
+		Encoding:      _defaultEncoding,
+		caller:        false,
+	}
+	c.SetDivision("time") // 设置归档方式，"time"时间归档 "size" 文件大小归档
+	c.SetTimeUnit(Day)    // 时间归档 可以设置切割单位
+	c.SetEncoding("json") // 输出格式 "json" 或者 "console"
+
+	if !conf.Console {
+		c.CloseConsoleDisplay()
+	}
+
+	c.SetInfoFile(conf.LogFile) // 设置info级别日志文件
+	if conf.LogErrorFile != "" {
+		c.SetErrorFile(conf.LogErrorFile) // 设置warn级别日志文件
+	}
+
+	// 设置最低记录级别
+	c.SetMinLevel(ParseLevel(conf.Level))
+
+	c.InitLogger()
+
+	isInit = true
+}
+
 func infoLevel() zap.LevelEnablerFunc {
 	return func(lvl zapcore.Level) bool {
 		if lvl < MinLevel {
@@ -77,52 +113,6 @@ func warnLevel() zap.LevelEnablerFunc {
 		}
 		return lvl >= zapcore.WarnLevel
 	}
-}
-
-type logConfig struct {
-	Level        string `toml:"level"`        // 日志记录级别
-	LogFile      string `toml:"logFile"`      // 日志文件
-	LogErrorFile string `toml:"logErrorFile"` // 错误日志文件 -默认不独立存放
-	Division     string `toml:"logFile"`      // 设置归档方式，"time"时间归档 "size" 文件大小归档
-	Console      bool   `toml:"console"`      // 是否开启控制台输出
-}
-
-func Init() {
-
-	if opt != nil {
-		return
-	}
-
-	opt = &Options{
-		Division:      _defaultDivision,
-		LevelSeparate: false,
-		TimeUnit:      _defaultUnit,
-		Encoding:      _defaultEncoding,
-		caller:        false,
-	}
-
-	Config = &logConfig{}
-	err := config.Unmarshal("log", Config)
-	if err == nil {
-		if !Config.Console {
-			opt.CloseConsoleDisplay()
-		}
-
-		opt.SetInfoFile(Config.LogFile) // 设置info级别日志文件
-		if Config.LogErrorFile != "" {
-			opt.SetErrorFile(Config.LogErrorFile) // 设置warn级别日志文件
-		}
-
-		// 设置最低记录级别
-		opt.SetMinLevel(ParseLevel(Config.Level))
-	}
-
-	opt.SetDivision("time") // 设置归档方式，"time"时间归档 "size" 文件大小归档
-	opt.SetTimeUnit(Day)    // 时间归档 可以设置切割单位
-	opt.SetEncoding("json") // 输出格式 "json" 或者 "console"
-
-	opt.InitLogger()
-
 }
 
 func (c *Options) SetDivision(division string) {
@@ -251,8 +241,8 @@ func (c *Options) InitLogger() *Log {
 
 	logger = zap.New(zapcore.NewTee(cos...), opts...)
 
-	L = &Log{logger}
-	return L
+	Logger = &Log{logger}
+	return Logger
 }
 
 func (c *Options) sizeDivisionWriter(filename string) io.Writer {
@@ -292,58 +282,58 @@ func Skip() zap.Field {
 }
 
 func Info(msg string, args ...zap.Field) {
-	Init()
-	L.Logger.Info(msg, args...)
+	initLogger()
+	Logger.L.Info(msg, args...)
 }
 
 func Error(msg string, args ...zap.Field) {
-	Init()
-	L.Logger.Error(msg, args...)
+	initLogger()
+	Logger.L.Error(msg, args...)
 }
 
 func Warn(msg string, args ...zap.Field) {
-	Init()
-	L.Logger.Warn(msg, args...)
+	initLogger()
+	Logger.L.Warn(msg, args...)
 }
 
 func Debug(msg string, args ...zap.Field) {
-	Init()
-	L.Logger.Debug(msg, args...)
+	initLogger()
+	Logger.L.Debug(msg, args...)
 }
 
 func Fatal(msg string, args ...zap.Field) {
-	Init()
-	L.Logger.Fatal(msg, args...)
+	initLogger()
+	Logger.L.Fatal(msg, args...)
 }
 
 func Infof(format string, args ...any) {
-	Init()
+	initLogger()
 	logMsg := fmt.Sprintf(format, args...)
-	L.Logger.Info(logMsg)
+	Logger.L.Info(logMsg)
 }
 
 func Errorf(format string, args ...any) {
-	Init()
+	initLogger()
 	logMsg := fmt.Sprintf(format, args...)
-	L.Logger.Error(logMsg)
+	Logger.L.Error(logMsg)
 }
 
 func Warnf(format string, args ...any) {
-	Init()
+	initLogger()
 	logMsg := fmt.Sprintf(format, args...)
-	L.Logger.Warn(logMsg)
+	Logger.L.Warn(logMsg)
 }
 
 func Debugf(format string, args ...any) {
-	Init()
+	initLogger()
 	logMsg := fmt.Sprintf(format, args...)
-	L.Logger.Debug(logMsg)
+	Logger.L.Debug(logMsg)
 }
 
 func Fatalf(format string, args ...any) {
-	Init()
+	initLogger()
 	logMsg := fmt.Sprintf(format, args...)
-	L.Logger.Fatal(logMsg)
+	Logger.L.Fatal(logMsg)
 }
 
 func With(k string, v any) zap.Field {
@@ -372,10 +362,10 @@ func withContext(ctx context.Context) *Log {
 	logArgs, _ := l.([]zap.Field)
 
 	ctxLogger := &Log{
-		Logger: L.Logger,
+		L: Logger.L,
 	}
 	if len(logArgs) > 0 {
-		ctxLogger.Logger = ctxLogger.Logger.With(logArgs...)
+		ctxLogger.L = ctxLogger.L.With(logArgs...)
 	}
 	return ctxLogger
 }
@@ -404,46 +394,46 @@ func ParseLevel(text string) zapcore.Level {
 }
 
 func (l *Log) Info(msg string, args ...zap.Field) {
-	l.Logger.Info(msg, args...)
+	l.L.Info(msg, args...)
 }
 
 func (l *Log) Error(msg string, args ...zap.Field) {
-	l.Logger.Error(msg, args...)
+	l.L.Error(msg, args...)
 }
 
 func (l *Log) Warn(msg string, args ...zap.Field) {
-	l.Logger.Warn(msg, args...)
+	l.L.Warn(msg, args...)
 }
 
 func (l *Log) Debug(msg string, args ...zap.Field) {
-	l.Logger.Debug(msg, args...)
+	l.L.Debug(msg, args...)
 }
 
 func (l *Log) Fatal(msg string, args ...zap.Field) {
-	l.Logger.Fatal(msg, args...)
+	l.L.Fatal(msg, args...)
 }
 
 func (l *Log) Infof(format string, args ...any) {
 	logMsg := fmt.Sprintf(format, args...)
-	l.Logger.Info(logMsg)
+	l.L.Info(logMsg)
 }
 
 func (l *Log) Errorf(format string, args ...any) {
 	logMsg := fmt.Sprintf(format, args...)
-	l.Logger.Error(logMsg)
+	l.L.Error(logMsg)
 }
 
 func (l *Log) Warnf(format string, args ...any) {
 	logMsg := fmt.Sprintf(format, args...)
-	l.Logger.Warn(logMsg)
+	l.L.Warn(logMsg)
 }
 
 func (l *Log) Debugf(format string, args ...any) {
 	logMsg := fmt.Sprintf(format, args...)
-	l.Logger.Debug(logMsg)
+	l.L.Debug(logMsg)
 }
 
 func (l *Log) Fatalf(format string, args ...any) {
 	logMsg := fmt.Sprintf(format, args...)
-	l.Logger.Fatal(logMsg)
+	l.L.Fatal(logMsg)
 }
