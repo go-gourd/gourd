@@ -1,5 +1,5 @@
 
-Gourd 0.2 Beta 2023
+Gourd 0.3 Beta 2023
 ===============
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-gourd/gourd)](https://goreportcard.com/report/github.com/go-gourd/gourd)
@@ -10,7 +10,7 @@ Gourd 0.2 Beta 2023
 ```text
    _____                     _
   / ____|                   | |  Go       go1.20
- | |  __  ___  _   _ _ __ __| |  Gourd    v0.2.9 (11)
+ | |  __  ___  _   _ _ __ __| |  Gourd    v0.3.1 (14)
  | | |_ |/ _ \| | | | '__/ _` |  Public   ./public
  | |__| | (_) | |_| | | | (_| |  Temp Dir ./runtime
   \_____|\___/ \__,_|_|  \__,_|  Log Dir  ./runtime/log
