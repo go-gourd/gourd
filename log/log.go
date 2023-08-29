@@ -1,10 +1,9 @@
 package log
 
 import (
-	"context"
 	"fmt"
 	"github.com/go-gourd/gourd/config"
-	"github.com/go-gourd/gourd/log/rotatelogs"
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -17,16 +16,13 @@ import (
 // 修改来自： https://github.com/gohp/logger
 
 const (
-	TimeDivision = "time"
-	SizeDivision = "size"
-
 	_defaultEncoding = "console"
-	_defaultDivision = "size"
-	_defaultUnit     = Hour
+	_defaultDivision = "time"
+	_defaultUnit     = Day
 )
 
 var (
-	Logger                    *Log
+	Logger                    *zap.Logger
 	_encoderNameToConstructor = map[string]func(zapcore.EncoderConfig) zapcore.Encoder{
 		"console": func(encoderConfig zapcore.EncoderConfig) zapcore.Encoder {
 			return zapcore.NewConsoleEncoder(encoderConfig)
@@ -36,12 +32,7 @@ var (
 		},
 	}
 	MinLevel = zapcore.DebugLevel
-	isInit   = false
 )
-
-type Log struct {
-	L *zap.Logger
-}
 
 type Options struct {
 	Encoding      string
@@ -61,13 +52,11 @@ type Options struct {
 }
 
 // 初始化日志工具
-func initLogger() {
+func getLogger() *zap.Logger {
 
-	if isInit {
-		return
+	if Logger != nil {
+		return Logger
 	}
-
-	conf := config.GetLogConfig()
 
 	c := &Options{
 		Division:      _defaultDivision,
@@ -76,25 +65,49 @@ func initLogger() {
 		Encoding:      _defaultEncoding,
 		caller:        false,
 	}
-	c.SetDivision("time") // 设置归档方式，"time"时间归档 "size" 文件大小归档
-	c.SetTimeUnit(Day)    // 时间归档 可以设置切割单位
-	c.SetEncoding("json") // 输出格式 "json" 或者 "console"
 
-	if !conf.Console {
-		c.CloseConsoleDisplay()
+	conf := config.GetLogConfig()
+
+	// 输出格式 "json" 或者 "console"
+	if conf.Encoding != "" {
+		c.Encoding = conf.Encoding
 	}
 
-	c.SetInfoFile(conf.LogFile) // 设置info级别日志文件
-	if conf.LogErrorFile != "" {
-		c.SetErrorFile(conf.LogErrorFile) // 设置warn级别日志文件
+	// 时间归档 可以设置切割单位
+	if conf.TimeUnit != "" {
+		c.TimeUnit = TimeUnit(conf.TimeUnit)
+	}
+
+	// 设置归档方式，"time"时间归档 "size" 文件大小归档
+	if conf.Division != "" {
+		c.Division = conf.Division
+	}
+
+	// 设置是否开启控制台输出
+	if !conf.Console {
+		c.closeDisplay = 1
+	}
+
+	// 设置info级别日志文件
+	if conf.LogFile != "" {
+		c.InfoFilename = conf.LogFile
+	}
+
+	if conf.ErrorFile != "" {
+		// 设置warn级别日志文件
+		c.LevelSeparate = true
+		c.ErrorFilename = conf.ErrorFile
 	}
 
 	// 设置最低记录级别
-	c.SetMinLevel(ParseLevel(conf.Level))
+	if conf.Level == "" {
+		conf.Level = "debug"
+	}
+	MinLevel = parseLevel(conf.Level)
 
 	c.InitLogger()
 
-	isInit = true
+	return Logger
 }
 
 func infoLevel() zap.LevelEnablerFunc {
@@ -115,49 +128,12 @@ func warnLevel() zap.LevelEnablerFunc {
 	}
 }
 
-func (c *Options) SetDivision(division string) {
-	c.Division = division
-}
-
-func (c *Options) SetEncodeTime(format string) {
-	c.EncodeTime = format
-}
-
-func (c *Options) CloseConsoleDisplay() {
-	c.closeDisplay = 1
-}
-
-func (c *Options) SetCaller(b bool) {
-	c.caller = b
-}
-
-func (c *Options) SetTimeUnit(t TimeUnit) {
-	c.TimeUnit = t
-}
-
-func (c *Options) SetErrorFile(path string) {
-	c.LevelSeparate = true
-	c.ErrorFilename = path
-}
-
-func (c *Options) SetInfoFile(path string) {
-	c.InfoFilename = path
-}
-
-func (c *Options) SetEncoding(encoding string) {
-	c.Encoding = encoding
-}
-
-func (c *Options) SetMinLevel(level zapcore.Level) {
-	MinLevel = level
-}
-
 // isOutput whether set output file
 func (c *Options) isOutput() bool {
 	return c.InfoFilename != ""
 }
 
-func (c *Options) InitLogger() *Log {
+func (c *Options) InitLogger() *zap.Logger {
 	var (
 		logger             *zap.Logger
 		infoHook, warnHook io.Writer
@@ -195,12 +171,12 @@ func (c *Options) InitLogger() *Log {
 	// zap-core WriteSyncer setting
 	if c.isOutput() {
 		switch c.Division {
-		case TimeDivision:
+		case "time":
 			infoHook = c.timeDivisionWriter(c.InfoFilename)
 			if c.LevelSeparate {
 				warnHook = c.timeDivisionWriter(c.ErrorFilename)
 			}
-		case SizeDivision:
+		case "size":
 			infoHook = c.sizeDivisionWriter(c.InfoFilename)
 			if c.LevelSeparate {
 				warnHook = c.sizeDivisionWriter(c.ErrorFilename)
@@ -241,7 +217,7 @@ func (c *Options) InitLogger() *Log {
 
 	logger = zap.New(zapcore.NewTee(cos...), opts...)
 
-	Logger = &Log{logger}
+	Logger = logger
 	return Logger
 }
 
@@ -265,6 +241,7 @@ func (c *Options) timeDivisionWriter(filename string) io.Writer {
 	}
 	filename = s
 
+	// 用于日志切割归档
 	hook, err := rotatelogs.New(
 		filename,
 		rotatelogs.WithMaxAge(time.Duration(int64(24*time.Hour)*int64(c.MaxAge))),
@@ -282,101 +259,54 @@ func Skip() zap.Field {
 }
 
 func Info(msg string, args ...zap.Field) {
-	initLogger()
-	Logger.L.Info(msg, args...)
+	getLogger().Info(msg, args...)
 }
 
 func Error(msg string, args ...zap.Field) {
-	initLogger()
-	Logger.L.Error(msg, args...)
+	getLogger().Error(msg, args...)
 }
 
 func Warn(msg string, args ...zap.Field) {
-	initLogger()
-	Logger.L.Warn(msg, args...)
+	getLogger().Warn(msg, args...)
 }
 
 func Debug(msg string, args ...zap.Field) {
-	initLogger()
-	Logger.L.Debug(msg, args...)
+	getLogger().Debug(msg, args...)
 }
 
 func Fatal(msg string, args ...zap.Field) {
-	initLogger()
-	Logger.L.Fatal(msg, args...)
+	getLogger().Fatal(msg, args...)
 }
 
 func Infof(format string, args ...any) {
-	initLogger()
+
 	logMsg := fmt.Sprintf(format, args...)
-	Logger.L.Info(logMsg)
+	getLogger().Info(logMsg)
 }
 
 func Errorf(format string, args ...any) {
-	initLogger()
+
 	logMsg := fmt.Sprintf(format, args...)
-	Logger.L.Error(logMsg)
+	getLogger().Error(logMsg)
 }
 
 func Warnf(format string, args ...any) {
-	initLogger()
 	logMsg := fmt.Sprintf(format, args...)
-	Logger.L.Warn(logMsg)
+	getLogger().Warn(logMsg)
 }
 
 func Debugf(format string, args ...any) {
-	initLogger()
 	logMsg := fmt.Sprintf(format, args...)
-	Logger.L.Debug(logMsg)
+	getLogger().Debug(logMsg)
 }
 
 func Fatalf(format string, args ...any) {
-	initLogger()
 	logMsg := fmt.Sprintf(format, args...)
-	Logger.L.Fatal(logMsg)
+	getLogger().Fatal(logMsg)
 }
 
-func With(k string, v any) zap.Field {
-	return zap.Any(k, v)
-}
-
-func WithError(err error) zap.Field {
-	return zap.NamedError("error", err)
-}
-
-func AddContext(ctx context.Context, fields ...zap.Field) context.Context {
-	l := ctx.Value("_logger_ctx_val")
-	logArgs, ok := l.([]zap.Field)
-	if ok || logArgs == nil {
-		logArgs = append(logArgs, fields...)
-		ctx = context.WithValue(ctx, "_logger_ctx_val", logArgs)
-	}
-	return ctx
-}
-
-func withContext(ctx context.Context) *Log {
-	if ctx == nil {
-		return nil
-	}
-	l := ctx.Value("_logger_ctx_val")
-	logArgs, _ := l.([]zap.Field)
-
-	ctxLogger := &Log{
-		L: Logger.L,
-	}
-	if len(logArgs) > 0 {
-		ctxLogger.L = ctxLogger.L.With(logArgs...)
-	}
-	return ctxLogger
-}
-
-// Ctx new func
-func Ctx(ctx context.Context) *Log {
-	return withContext(ctx)
-}
-
-// ParseLevel 将字符串转换成枚举
-func ParseLevel(text string) zapcore.Level {
+// parseLevel 将字符串转换成枚举
+func parseLevel(text string) zapcore.Level {
 	switch text {
 	case "debug", "DEBUG":
 		return zapcore.DebugLevel
@@ -391,49 +321,4 @@ func ParseLevel(text string) zapcore.Level {
 	default:
 		return zapcore.DebugLevel
 	}
-}
-
-func (l *Log) Info(msg string, args ...zap.Field) {
-	l.L.Info(msg, args...)
-}
-
-func (l *Log) Error(msg string, args ...zap.Field) {
-	l.L.Error(msg, args...)
-}
-
-func (l *Log) Warn(msg string, args ...zap.Field) {
-	l.L.Warn(msg, args...)
-}
-
-func (l *Log) Debug(msg string, args ...zap.Field) {
-	l.L.Debug(msg, args...)
-}
-
-func (l *Log) Fatal(msg string, args ...zap.Field) {
-	l.L.Fatal(msg, args...)
-}
-
-func (l *Log) Infof(format string, args ...any) {
-	logMsg := fmt.Sprintf(format, args...)
-	l.L.Info(logMsg)
-}
-
-func (l *Log) Errorf(format string, args ...any) {
-	logMsg := fmt.Sprintf(format, args...)
-	l.L.Error(logMsg)
-}
-
-func (l *Log) Warnf(format string, args ...any) {
-	logMsg := fmt.Sprintf(format, args...)
-	l.L.Warn(logMsg)
-}
-
-func (l *Log) Debugf(format string, args ...any) {
-	logMsg := fmt.Sprintf(format, args...)
-	l.L.Debug(logMsg)
-}
-
-func (l *Log) Fatalf(format string, args ...any) {
-	logMsg := fmt.Sprintf(format, args...)
-	l.L.Fatal(logMsg)
 }

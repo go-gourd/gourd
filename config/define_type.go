@@ -1,5 +1,6 @@
 package config
 
+// AppConfig 应用配置
 type AppConfig struct {
 	Name    string `toml:"name"`    //应用名称
 	Debug   bool   `toml:"debug"`   //调试模式
@@ -7,6 +8,7 @@ type AppConfig struct {
 	Version string `toml:"version"` //版本号
 }
 
+// HttpConfig Http服务器配置
 type HttpConfig struct {
 	Enable bool   `toml:"enable"` //是否启用Http服务器
 	Host   string `toml:"host"`   //监听域名、IP
@@ -14,13 +16,18 @@ type HttpConfig struct {
 	Public string `toml:"public"` //静态资源目录
 }
 
+// LogConfig 日志配置
 type LogConfig struct {
-	Level        string `toml:"level"`        //日志记录级别
-	LogFile      string `toml:"logFile"`      //日志文件
-	LogErrorFile string `toml:"logErrorFile"` //错误日志文件 -默认不独立存放
-	Console      bool   `toml:"console"`      //是否开启控制台输出
+	Level     string `toml:"level"`     //日志记录级别
+	LogFile   string `toml:"logFile"`   //日志文件
+	ErrorFile string `toml:"errorFile"` //错误日志文件 -默认不独立存放
+	Console   bool   `toml:"console"`   //是否开启控制台输出
+	Encoding  string `toml:"encoding"`  //输出格式 "json" 或者 "console"
+	Division  string `toml:"division"`  //归档方式 time、size
+	TimeUnit  string `toml:"timeUnit"`  //按时间分割日志的单位 year、month、day、hour、minute
 }
 
+// DbConfigType 适用于单个连接的配置
 type DbConfigType struct {
 	Type        string `toml:"type"`        //数据库类型
 	Host        string `toml:"host"`        //连接地址

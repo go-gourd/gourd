@@ -31,22 +31,34 @@ type App struct {
 // Init 初始化应用
 func (app *App) Init() {
 
-	app.Conf = config.GetAppConfig()
-	app.TempDir = app.Conf.TempDir
+	//触发Boot事件
+	event.Trigger("_boot", nil)
 
-	//版本显示
-	if app.VersionName != "" {
-		app.Version = VersionNum
-		app.VersionName = VersionName
+	app.Conf = config.GetAppConfig()
+
+	//临时目录
+	app.TempDir = app.Conf.TempDir
+	if app.TempDir == "" {
+		app.TempDir = "./runtime"
+	}
+
+	//版本号
+	app.Version = VersionNum
+	app.VersionName = VersionName
+
+	//版本显示(优先显示配置文件中的版本号)
+	if app.Conf.Version == "" {
+		app.Conf.Version = fmt.Sprintf("%s (%d)", app.VersionName, app.Version)
 	}
 
 	//创建TempDir
 	err := os.MkdirAll(app.TempDir, os.ModePerm)
 	if err != nil {
-		log.Errorf("Mkdir TempDir Err:%s", err.Error())
+		log.Errorf("Mkdir \"%s\" error : %s", app.TempDir, err.Error())
 		panic(err)
 	}
 
+	//输出Logo信息
 	if !app.DisableLogo {
 		var logo = "   _____                     _ \n" +
 			"  / ____|                   | |  Go       %s\n" +
@@ -64,15 +76,13 @@ func (app *App) Init() {
 		)
 	}
 
-	//触发Boot事件
-	event.Trigger("_boot", nil)
+	// 触发Init事件
+	event.Trigger("_init", nil)
 
 }
 
 // Run 启动应用
 func (app *App) Run() {
-	// 触发Init事件
-	event.Trigger("_init", nil)
 
 	//命令行解析
 	cmd.ConsoleParse()

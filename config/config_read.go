@@ -59,10 +59,7 @@ func GetLogConfig() *LogConfig {
 
 	// 初始化配置默认值
 	logConfig = &LogConfig{
-		Level:        "debug",
-		LogFile:      "./runtime/log/log.log",
-		LogErrorFile: "./runtime/log/error.log",
-		Console:      true,
+		Console: true,
 	}
 
 	var tomlData, err = ReadFile("log")
