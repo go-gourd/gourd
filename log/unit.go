@@ -1,48 +1,37 @@
 package log
 
-import (
-	"time"
-)
+import "time"
 
-type TimeUnit string
+type timeUnit string
 
-const (
-	Minute  = "minute"
-	Hour    = "hour"
-	Day     = "day"
-	Month   = "month"
-	Year    = "year"
-	RFC3339 = "2006-01-02T15:04:05Z07:00"
-)
-
-func (t TimeUnit) Format() string {
+func (t timeUnit) Format() string {
 	switch t {
-	case Minute:
+	case "minute":
 		return ".%Y%m%d%H%M"
-	case Hour:
+	case "hour":
 		return ".%Y%m%d%H"
-	case Day:
+	case "day":
 		return ".%Y%m%d"
-	case Month:
+	case "month":
 		return ".%Y%m"
-	case Year:
+	case "year":
 		return ".%Y"
 	default:
 		return ".%Y%m%d"
 	}
 }
 
-func (t TimeUnit) RotationGap() time.Duration {
+func (t timeUnit) RotationGap() time.Duration {
 	switch t {
-	case Minute:
+	case "minute":
 		return time.Minute
-	case Hour:
+	case "hour":
 		return time.Hour
-	case Day:
+	case "day":
 		return time.Hour * 24
-	case Month:
+	case "month":
 		return time.Hour * 24 * 30
-	case Year:
+	case "year":
 		return time.Hour * 24 * 365
 	default:
 		return time.Hour * 24

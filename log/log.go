@@ -13,12 +13,10 @@ import (
 	"time"
 )
 
-// 修改来自： https://github.com/gohp/logger
-
 const (
 	_defaultEncoding = "console"
 	_defaultDivision = "time"
-	_defaultUnit     = Day
+	_defaultUnit     = "day"
 )
 
 var (
@@ -31,10 +29,10 @@ var (
 			return zapcore.NewJSONEncoder(encoderConfig)
 		},
 	}
-	MinLevel = zapcore.DebugLevel
+	minLevel = zapcore.DebugLevel
 )
 
-type Options struct {
+type options struct {
 	Encoding      string
 	InfoFilename  string
 	ErrorFilename string
@@ -44,7 +42,7 @@ type Options struct {
 	Compress      bool
 	Division      string
 	LevelSeparate bool
-	TimeUnit      TimeUnit
+	TimeUnit      timeUnit
 	Stacktrace    bool
 	EncodeTime    string
 	closeDisplay  int
@@ -58,7 +56,7 @@ func getLogger() *zap.Logger {
 		return Logger
 	}
 
-	c := &Options{
+	c := &options{
 		Division:      _defaultDivision,
 		LevelSeparate: false,
 		TimeUnit:      _defaultUnit,
@@ -75,7 +73,7 @@ func getLogger() *zap.Logger {
 
 	// 时间归档 可以设置切割单位
 	if conf.TimeUnit != "" {
-		c.TimeUnit = TimeUnit(conf.TimeUnit)
+		c.TimeUnit = timeUnit(conf.TimeUnit)
 	}
 
 	// 设置归档方式，"time"时间归档 "size" 文件大小归档
@@ -103,7 +101,7 @@ func getLogger() *zap.Logger {
 	if conf.Level == "" {
 		conf.Level = "debug"
 	}
-	MinLevel = parseLevel(conf.Level)
+	minLevel = parseLevel(conf.Level)
 
 	c.InitLogger()
 
@@ -112,7 +110,7 @@ func getLogger() *zap.Logger {
 
 func infoLevel() zap.LevelEnablerFunc {
 	return func(lvl zapcore.Level) bool {
-		if lvl < MinLevel {
+		if lvl < minLevel {
 			return false
 		}
 		return lvl < zapcore.WarnLevel
@@ -121,7 +119,7 @@ func infoLevel() zap.LevelEnablerFunc {
 
 func warnLevel() zap.LevelEnablerFunc {
 	return func(lvl zapcore.Level) bool {
-		if lvl < MinLevel {
+		if lvl < minLevel {
 			return false
 		}
 		return lvl >= zapcore.WarnLevel
@@ -129,11 +127,11 @@ func warnLevel() zap.LevelEnablerFunc {
 }
 
 // isOutput whether set output file
-func (c *Options) isOutput() bool {
+func (c *options) isOutput() bool {
 	return c.InfoFilename != ""
 }
 
-func (c *Options) InitLogger() *zap.Logger {
+func (c *options) InitLogger() *zap.Logger {
 	var (
 		logger             *zap.Logger
 		infoHook, warnHook io.Writer
@@ -145,7 +143,7 @@ func (c *Options) InitLogger() *zap.Logger {
 		c.Encoding = _defaultEncoding
 	}
 	if c.EncodeTime == "" {
-		c.EncodeTime = RFC3339
+		c.EncodeTime = "2006-01-02T15:04:05Z07:00"
 	}
 	encoder := _encoderNameToConstructor[c.Encoding]
 
@@ -221,7 +219,7 @@ func (c *Options) InitLogger() *zap.Logger {
 	return Logger
 }
 
-func (c *Options) sizeDivisionWriter(filename string) io.Writer {
+func (c *options) sizeDivisionWriter(filename string) io.Writer {
 	hook := &lumberjack.Logger{
 		Filename:   filename,
 		MaxSize:    c.MaxSize,
@@ -232,7 +230,7 @@ func (c *Options) sizeDivisionWriter(filename string) io.Writer {
 	return hook
 }
 
-func (c *Options) timeDivisionWriter(filename string) io.Writer {
+func (c *options) timeDivisionWriter(filename string) io.Writer {
 
 	s := filename
 	i := strings.LastIndex(s, ".")
