@@ -3,8 +3,6 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/go-gourd/gourd/config"
-	"github.com/go-gourd/gourd/event"
 	"github.com/go-gourd/gourd/internal"
 	"github.com/go-gourd/gourd/log"
 	"os"
@@ -102,10 +100,6 @@ func coreCmdExec(args []string) bool {
 			}
 		}
 
-		// 开启Http监听服务
-		if config.GetHttpConfig().Enable {
-			event.Trigger("_http_start", nil)
-		}
 		return false
 	case "stop":
 		//停止后台进程
