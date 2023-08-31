@@ -2,6 +2,7 @@ package event
 
 type HandlerEvent func(params any)
 
+// 存放注册的事件回调
 var event = make(map[string][]HandlerEvent)
 
 // Listen 监听事件

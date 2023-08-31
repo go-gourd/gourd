@@ -1,4 +1,4 @@
-package core
+package internal
 
 const cmd = `
 Commands:
