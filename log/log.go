@@ -108,6 +108,10 @@ func getLogger() *zap.Logger {
 	return Logger
 }
 
+//TODO: 待完善
+// 1. 增加所有级别的日志文件切割
+// 2. 增加日志文件大小限制
+
 func infoLevel() zap.LevelEnablerFunc {
 	return func(lvl zapcore.Level) bool {
 		if lvl < minLevel {
@@ -277,13 +281,11 @@ func Fatal(msg string, args ...zap.Field) {
 }
 
 func Infof(format string, args ...any) {
-
 	logMsg := fmt.Sprintf(format, args...)
 	getLogger().Info(logMsg)
 }
 
 func Errorf(format string, args ...any) {
-
 	logMsg := fmt.Sprintf(format, args...)
 	getLogger().Error(logMsg)
 }

@@ -37,7 +37,7 @@ func (app *App) Init() {
 	app.Conf = config.GetAppConfig()
 
 	//临时目录
-	app.TempDir = app.Conf.TempDir
+	app.TempDir = app.Conf.Temp
 	if app.TempDir == "" {
 		app.TempDir = "./runtime"
 	}

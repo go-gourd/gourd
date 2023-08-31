@@ -5,18 +5,17 @@ import (
 	"os"
 )
 
+// 默认配置文件目录
+const defaultDir = "./config"
+
 var (
 	// 配置文件目录
-	configDir = "./config"
-
-	// 配置缓存
-	appConfig  *AppConfig
-	logConfig  *LogConfig
-	httpConfig *HttpConfig
-	dbConfig   *DbConfig
+	configDir = defaultDir
 )
 
-// SetConfigDir 设置配置文件目录
+var c Config
+
+// SetConfigDir 设置文件目录
 func SetConfigDir(path string) {
 	configDir = path
 }
@@ -24,66 +23,66 @@ func SetConfigDir(path string) {
 func GetAppConfig() *AppConfig {
 
 	//已存在 -返回
-	if appConfig != nil {
-		return appConfig
+	if c.App != nil {
+		return c.App
 	}
 
 	// 初始化配置默认值
-	appConfig = &AppConfig{
+	c.App = &AppConfig{
 		Name:    "gourd",
 		Debug:   false,
-		TempDir: "./runtime",
+		Temp:    "./runtime",
 		Version: "1.0.0",
 	}
 
 	tomlData, err := ReadFile("app")
 	if err != nil {
-		return appConfig
+		return c.App
 	}
 
 	// 配置文件存在，解析配置文件
-	err = toml.Unmarshal(tomlData, &appConfig)
+	err = toml.Unmarshal(tomlData, c.App)
 	if err != nil {
 		panic(err)
 	}
 
-	return appConfig
+	return c.App
 }
 
 func GetLogConfig() *LogConfig {
 
 	//已存在 -返回
-	if logConfig != nil {
-		return logConfig
+	if c.Log != nil {
+		return c.Log
 	}
 
 	// 初始化配置默认值
-	logConfig = &LogConfig{
+	c.Log = &LogConfig{
 		Console: true,
 	}
 
 	var tomlData, err = ReadFile("log")
 	if err != nil {
-		return logConfig
+		return c.Log
 	}
 
-	err = toml.Unmarshal(tomlData, &logConfig)
+	err = toml.Unmarshal(tomlData, c.Log)
 	if err != nil {
 		panic(err)
 	}
 
-	return logConfig
+	return c.Log
 }
 
 func GetHttpConfig() *HttpConfig {
 
 	//已存在 -返回
-	if httpConfig != nil {
-		return httpConfig
+	if c.Http != nil {
+		return c.Http
 	}
 
 	// 初始化配置默认值
-	httpConfig = &HttpConfig{
+	c.Http = &HttpConfig{
 		Enable: false,
 		Host:   "0.0.0.0",
 		Port:   8080,
@@ -92,38 +91,38 @@ func GetHttpConfig() *HttpConfig {
 
 	var tomlData, err = ReadFile("http")
 	if err != nil {
-		return httpConfig
+		return c.Http
 	}
 
-	err = toml.Unmarshal(tomlData, &httpConfig)
+	err = toml.Unmarshal(tomlData, c.Http)
 	if err != nil {
 		panic(err)
 	}
 
-	return httpConfig
+	return c.Http
 }
 
-func GetDbConfig() DbConfig {
+func GetDbConfig() DatabaseConfig {
 
 	//已存在 -返回
-	if dbConfig != nil {
-		return *dbConfig
+	if c.Database != nil {
+		return *c.Database
 	}
 
 	// 初始化配置默认值
-	dbConfig = &DbConfig{}
+	c.Database = &DatabaseConfig{}
 
 	var tomlData, err = ReadFile("database")
 	if err != nil {
-		return *dbConfig
+		return *c.Database
 	}
 
-	err = toml.Unmarshal(tomlData, dbConfig)
+	err = toml.Unmarshal(tomlData, c.Database)
 	if err != nil {
 		panic(err)
 	}
 
-	return *dbConfig
+	return *c.Database
 }
 
 // Unmarshal 读取自定义配置文件
