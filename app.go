@@ -16,8 +16,8 @@ import (
 
 // 版本信息
 const (
-	VersionNum  = 100
-	VersionName = "1.0.0"
+	VersionNum  = 101
+	VersionName = "1.0.1"
 )
 
 type App struct {
