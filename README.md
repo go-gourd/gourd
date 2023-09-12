@@ -1,5 +1,5 @@
 
-Gourd 0.3 Beta 2023
+Gourd 1.0
 ===============
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-gourd/gourd)](https://goreportcard.com/report/github.com/go-gourd/gourd)
@@ -10,16 +10,16 @@ Gourd 0.3 Beta 2023
 ```text
    _____                     _
   / ____|                   | |  Go       go1.20
- | |  __  ___  _   _ _ __ __| |  App      v0.3.1 (14)
+ | |  __  ___  _   _ _ __ __| |  App      v1.0.0 (100)
  | | |_ |/ _ \| | | | '__/ _` |  Public   ./public
  | |__| | (_) | |_| | | | (_| |  Temp Dir ./runtime
   \_____|\___/ \__,_|_|  \__,_|  Log Dir  ./runtime/log
 ```
-> Go-Gourd 是一个由事件驱动的快速开发框架，高度集成且灵活易用。
+> Go-Gourd 是一个由事件驱动的快速开发框架，结合php开发经验，更适合php宝宝的体质。
 
 ## 框架由来
-我正在学习Golang，是一名PHP开发者，学习过程中发现Go在很多地方对于php开发习惯很不友好。  
-为了从PHP更快上手Golang，我决定一边学习，一边构建一个自己用得惯的框架（代码结构）。  
+我正在学习Golang，是一名PHP开发者，学习过程中发现Go在很多地方对于PHP开发习惯很不友好。  
+为了从PHP更快上手Golang，我决定一边学习，一边构建一个自己用得惯的框架（脚手架）。  
 也希望能够帮到正在学习Golang的同学。
 
 ## 主要特性
