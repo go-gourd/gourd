@@ -16,7 +16,7 @@ import (
 // DaemonRun 守护进程模式运行
 func DaemonRun() {
 
-	tempDir := config.GetAppConfig().TempDir
+	tempDir := config.GetAppConfig().Temp
 	pidFile := tempDir + "/daemon.pid"
 
 	//先判断进程是否已存在
