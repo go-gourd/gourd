@@ -27,10 +27,12 @@ func DaemonRun() {
 		input := bufio.NewScanner(os.Stdin)
 		input.Scan()
 		v := input.Text()
-		fmt.Println(v)
 		if v != "n" {
 			killPid(pid)
-			os.Remove(pidFile)
+			err := os.Remove(pidFile)
+			if err != nil {
+				return
+			}
 		}
 	}
 
@@ -60,7 +62,9 @@ func getPid(pidFile string) (pid int) {
 	if err != nil {
 		return
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		_ = file.Close()
+	}(file)
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		i, err := strconv.Atoi(scanner.Text())
@@ -80,18 +84,20 @@ func killPid(pid int) {
 	err := syscall.Kill(pid, 0)
 	if err == nil {
 		// 进程存在
-		syscall.Kill(pid, syscall.SIGINT)
+		_ = syscall.Kill(pid, syscall.SIGINT)
 	}
 }
 
 // StopDaemonProcess 结束指定进程
 func StopDaemonProcess() {
-	pidFile := config.GetAppConfig().TempDir + "/daemon.pid"
+	pidFile := config.GetAppConfig().Temp + "/daemon.pid"
 
 	pid := getPid(pidFile)
 	if pid > 0 {
 		// pid存在
 		killPid(pid)
-		os.Remove(pidFile)
+		_ = os.Remove(pidFile)
+	} else {
+		fmt.Println("daemon process pid not exist")
 	}
 }
