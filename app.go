@@ -32,7 +32,7 @@ type App struct {
 func (app *App) Init() {
 
 	//触发Boot事件
-	event.Trigger("_boot", nil)
+	event.Trigger("app.boot", nil)
 
 	app.Conf = config.GetAppConfig()
 
@@ -77,7 +77,7 @@ func (app *App) Init() {
 	}
 
 	// 触发Init事件
-	event.Trigger("_init", nil)
+	event.Trigger("app.init", nil)
 
 }
 
@@ -88,7 +88,7 @@ func (app *App) Run() {
 	cmd.ConsoleParse()
 
 	// 触发Start事件
-	event.Trigger("_start", nil)
+	event.Trigger("app.start", nil)
 
 	// 守护进程 -等待中断信号以优雅地关闭服务器（设置 5 秒的超时时间）
 	quit := make(chan os.Signal)
@@ -100,7 +100,7 @@ func (app *App) Run() {
 	defer cancel()
 
 	// 触发停止事件
-	event.Trigger("_stop", ctx)
+	event.Trigger("app.stop", ctx)
 
 	log.Info("Server exiting", log.Skip())
 }

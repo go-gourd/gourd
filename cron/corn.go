@@ -25,7 +25,7 @@ func Init() {
 	c = cron.New()
 
 	//系统启动
-	event.Listen("_start", func(_ any) {
+	event.Listen("app.start", func(_ any) {
 		// 开始执行（每个任务会在自己的 goroutine 中执行）
 		c.Start()
 	})
