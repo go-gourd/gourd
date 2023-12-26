@@ -11,7 +11,7 @@ Gourd 1.0
    _____                     _
   / ____|                   | |  Go       go1.20
  | |  __  ___  _   _ _ __ __| |  App      v1.0.0 (100)
- | | |_ |/ _ \| | | | '__/ _` |  Public   ./public
+ | | |_ |/ _ \| | | | '__/ _` |  Static   ./web/static
  | |__| | (_) | |_| | | | (_| |  Temp Dir ./runtime
   \_____|\___/ \__,_|_|  \__,_|  Log Dir  ./runtime/log
 ```

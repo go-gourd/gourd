@@ -13,7 +13,7 @@ type HttpConfig struct {
 	Enable bool   `toml:"enable" json:"enable"` //是否启用Http服务器
 	Host   string `toml:"host" json:"host"`     //监听域名、IP
 	Port   uint32 `toml:"port" json:"port"`     //监听端口
-	Public string `toml:"public" json:"public"` //静态资源目录
+	Static string `toml:"static" json:"static"` //静态资源目录
 }
 
 // LogConfig 日志配置

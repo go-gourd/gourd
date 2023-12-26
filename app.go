@@ -63,7 +63,7 @@ func (app *App) Init() {
 		var logo = "   _____                     _ \n" +
 			"  / ____|                   | |  Go       %s\n" +
 			" | |  __  ___  _   _ _ __ __| |  App      v%s (%d)\n" +
-			" | | |_ |/ _ \\| | | | '__/ _` |  Public   %s\n" +
+			" | | |_ |/ _ \\| | | | '__/ _` |  Static   %s\n" +
 			" | |__| | (_) | |_| | | | (_| |  Temp Dir %s\n" +
 			"  \\_____|\\___/ \\__,_|_|  \\__,_|  Log Dir  %s\n" +
 			"--------------------------------------------------------\n"
@@ -72,7 +72,7 @@ func (app *App) Init() {
 		logDirIndex := strings.LastIndex(logFile, "/")
 		fmt.Printf(
 			logo, runtime.Version(), app.VersionName, app.Version,
-			config.GetHttpConfig().Public, app.TempDir, logFile[:logDirIndex],
+			config.GetHttpConfig().Static, app.TempDir, logFile[:logDirIndex],
 		)
 	}
 

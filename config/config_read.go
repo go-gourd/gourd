@@ -86,7 +86,7 @@ func GetHttpConfig() *HttpConfig {
 		Enable: false,
 		Host:   "0.0.0.0",
 		Port:   8080,
-		Public: "",
+		Static: "",
 	}
 
 	var tomlData, err = ReadFile("http")
