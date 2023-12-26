@@ -1,4 +1,4 @@
-package gourd
+package test
 
 import (
 	"fmt"
