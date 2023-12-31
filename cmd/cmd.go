@@ -3,7 +3,8 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/go-gourd/gourd/internal"
+	"github.com/go-gourd/gourd/internal/command"
+	"github.com/go-gourd/gourd/internal/daemon"
 	"github.com/go-gourd/gourd/log"
 	"os"
 	"path"
@@ -60,7 +61,7 @@ func ConsoleParse() {
 
 	if len(args) == 1 {
 		if defaultCmd == nil {
-			fmt.Print(fmt.Sprintf(internal.NoCmdHelp, fileName) + getCmdListHelps())
+			fmt.Print(fmt.Sprintf(command.NoCmdHelp, fileName) + getCmdListHelps())
 			os.Exit(0)
 		}
 
@@ -72,7 +73,7 @@ func ConsoleParse() {
 	// 解析执行命令行
 	err := Exec(args[1], args)
 	if err != nil {
-		fmt.Print(fmt.Sprintf(internal.UndefinedCmdHelp, args[1], fileName) + getCmdListHelps())
+		fmt.Print(fmt.Sprintf(command.UndefinedCmdHelp, args[1], fileName) + getCmdListHelps())
 		os.Exit(0)
 	}
 }
@@ -93,7 +94,7 @@ func coreCmdExec(args []string) bool {
 				fmt.Println("[Warn] The daemon does not support Windows.")
 			} else {
 				//守护进程，成功后会终止当前应用
-				internal.DaemonRun()
+				daemon.DaemonRun()
 				log.Info("Daemon Running...")
 				fmt.Println("[Info] Daemon Running...")
 				os.Exit(0)
@@ -103,7 +104,7 @@ func coreCmdExec(args []string) bool {
 		return false
 	case "stop":
 		//停止后台进程
-		internal.StopDaemonProcess()
+		daemon.StopDaemonProcess()
 		log.Info("Daemon Process Stopped.")
 		fmt.Println("[Info] Daemon Process Stopped.")
 		os.Exit(0)

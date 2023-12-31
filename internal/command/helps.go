@@ -1,6 +1,6 @@
-package internal
+package command
 
-const cmd = `
+const CmdDetail = `
 Commands:
   start    Start app
    -d  Daemon process
@@ -9,8 +9,8 @@ Commands:
 `
 
 const NoCmdHelp = `Welcome To Go-Gourd Command Console!
-Usage: %s COMMAND` + cmd
+Usage: %s COMMAND` + CmdDetail
 
 const UndefinedCmdHelp = `The command '%s' is not exists!
 Welcome To Go-Gourd Command Console!
-Usage: %s COMMAND` + cmd
+Usage: %s COMMAND` + CmdDetail

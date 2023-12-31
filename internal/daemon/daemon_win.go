@@ -1,6 +1,6 @@
 //go:build windows || darwin
 
-package internal
+package daemon
 
 // DaemonRun 守护进程模式运行
 func DaemonRun() {
