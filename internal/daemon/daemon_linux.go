@@ -13,8 +13,8 @@ import (
 	"syscall"
 )
 
-// DaemonRun 守护进程模式运行
-func DaemonRun() {
+// Run 守护进程模式运行
+func Run() {
 
 	tempDir := config.GetAppConfig().Temp
 	pidFile := tempDir + "/daemon.pid"

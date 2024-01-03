@@ -2,8 +2,8 @@
 
 package daemon
 
-// DaemonRun 守护进程模式运行
-func DaemonRun() {
+// Run 守护进程模式运行
+func Run() {
 	//win平台不支持
 }
 

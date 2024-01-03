@@ -94,7 +94,7 @@ func coreCmdExec(args []string) bool {
 				fmt.Println("[Warn] The daemon does not support Windows.")
 			} else {
 				//守护进程，成功后会终止当前应用
-				daemon.DaemonRun()
+				daemon.Run()
 				log.Info("Daemon Running...")
 				fmt.Println("[Info] Daemon Running...")
 				os.Exit(0)
