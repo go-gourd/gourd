@@ -4,6 +4,7 @@ package config
 type AppConfig struct {
 	Name    string `toml:"name" json:"name"`       //应用名称
 	Debug   bool   `toml:"debug" json:"debug"`     //调试模式
+	Runtime string `toml:"runtime" json:"runtime"` //运行时目录
 	Temp    string `toml:"temp" json:"temp"`       //临时文件目录
 	Version string `toml:"version" json:"version"` //版本号
 }

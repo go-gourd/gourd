@@ -38,9 +38,6 @@ func (app *App) Init() {
 
 	//临时目录
 	app.TempDir = app.Conf.Temp
-	if app.TempDir == "" {
-		app.TempDir = "./runtime"
-	}
 
 	//版本号
 	app.Version = VersionNum
@@ -78,7 +75,6 @@ func (app *App) Init() {
 
 	// 触发Init事件
 	event.Trigger("app.init", nil)
-
 }
 
 // Run 启动应用

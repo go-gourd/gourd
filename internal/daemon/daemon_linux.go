@@ -16,7 +16,7 @@ import (
 // Run 守护进程模式运行
 func Run() {
 
-	tempDir := config.GetAppConfig().Temp
+	tempDir := config.GetAppConfig().Runtime
 	pidFile := tempDir + "/daemon.pid"
 
 	//先判断进程是否已存在
@@ -90,7 +90,7 @@ func killPid(pid int) {
 
 // StopDaemonProcess 结束指定进程
 func StopDaemonProcess() {
-	pidFile := config.GetAppConfig().Temp + "/daemon.pid"
+	pidFile := config.GetAppConfig().Runtime + "/daemon.pid"
 
 	pid := getPid(pidFile)
 	if pid > 0 {

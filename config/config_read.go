@@ -11,9 +11,9 @@ const defaultDir = "./config"
 var (
 	// 配置文件目录
 	configDir = defaultDir
+	// 所有配置
+	c Config
 )
-
-var c Config
 
 // SetConfigDir 设置文件目录
 func SetConfigDir(path string) {
@@ -31,17 +31,13 @@ func GetAppConfig() *AppConfig {
 	c.App = &AppConfig{
 		Name:    "gourd",
 		Debug:   false,
-		Temp:    "./runtime",
+		Runtime: "./runtime",
+		Temp:    "./runtime/temp",
 		Version: "1.0.0",
 	}
 
-	tomlData, err := ReadFile("app")
-	if err != nil {
-		return c.App
-	}
-
-	// 配置文件存在，解析配置文件
-	err = toml.Unmarshal(tomlData, c.App)
+	// 读取配置文件
+	err := Unmarshal("app", c.App)
 	if err != nil {
 		panic(err)
 	}
@@ -61,12 +57,8 @@ func GetLogConfig() *LogConfig {
 		Console: true,
 	}
 
-	var tomlData, err = ReadFile("log")
-	if err != nil {
-		return c.Log
-	}
-
-	err = toml.Unmarshal(tomlData, c.Log)
+	// 读取配置文件
+	err := Unmarshal("log", c.Log)
 	if err != nil {
 		panic(err)
 	}
@@ -89,12 +81,8 @@ func GetHttpConfig() *HttpConfig {
 		Static: "",
 	}
 
-	var tomlData, err = ReadFile("http")
-	if err != nil {
-		return c.Http
-	}
-
-	err = toml.Unmarshal(tomlData, c.Http)
+	// 读取配置文件
+	err := Unmarshal("http", c.Http)
 	if err != nil {
 		panic(err)
 	}
@@ -112,12 +100,8 @@ func GetDbConfig() DatabaseConfig {
 	// 初始化配置默认值
 	c.Database = &DatabaseConfig{}
 
-	var tomlData, err = ReadFile("database")
-	if err != nil {
-		return *c.Database
-	}
-
-	err = toml.Unmarshal(tomlData, c.Database)
+	// 读取配置文件
+	err := Unmarshal("database", c.Database)
 	if err != nil {
 		panic(err)
 	}
