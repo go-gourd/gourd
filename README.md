@@ -1,5 +1,5 @@
 
-Gourd 1.0
+Gourd 1.1
 ===============
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-gourd/gourd)](https://goreportcard.com/report/github.com/go-gourd/gourd)
@@ -9,18 +9,13 @@ Gourd 1.0
 
 ```text
    _____                     _
-  / ____|                   | |  Go       go1.20
- | |  __  ___  _   _ _ __ __| |  App      v1.0.0 (100)
- | | |_ |/ _ \| | | | '__/ _` |  Static   ./web/static
+  / ____|                   | |  Go       go1.21.1
+ | |  __  ___  _   _ _ __ __| |  App      v1.1.0 (105)
+ | | |_ |/ _ \| | | | '__/ _` |  Public   ./web/static
  | |__| | (_) | |_| | | | (_| |  Temp Dir ./runtime
   \_____|\___/ \__,_|_|  \__,_|  Log Dir  ./runtime/log
 ```
-> Go-Gourd 是一个由事件驱动的快速开发框架，结合php开发经验，更适合php宝宝的体质。
-
-## 框架由来
-我正在学习Golang，是一名PHP开发者，学习过程中发现Go在很多地方对于PHP开发习惯很不友好。  
-为了从PHP更快上手Golang，我决定一边学习，一边构建一个自己用得惯的框架（脚手架）。  
-也希望能够帮到正在学习Golang的同学。
+> Go-Gourd 是一个由事件驱动的快速开发框架，轻量、高效、易用。
 
 ## 主要特性
 * 开箱即用
@@ -31,13 +26,13 @@ Gourd 1.0
 * 日志工具
 
 ## 快速开始
-使用git下载
+使用git clone下载示例项目
 
 ```bash
 git clone https://github.com/go-gourd/gourd-app.git
 ```
 
-下载依赖
+下载依赖项
 ```bash
 go mod tidy
 ```
@@ -51,7 +46,7 @@ go run main.go
 
 ## 参考文档
 
-https://github.com/go-gourd/gourd-app/wiki
+https://github.com/go-gourd/gourd/wiki
 
 ## 参与开发
 
