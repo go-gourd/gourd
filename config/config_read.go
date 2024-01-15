@@ -20,6 +20,10 @@ func SetConfigDir(path string) {
 	configDir = path
 }
 
+func SetAppConfig(app *AppConfig) {
+	c.App = app
+}
+
 func GetAppConfig() *AppConfig {
 
 	//已存在 -返回
@@ -44,6 +48,10 @@ func GetAppConfig() *AppConfig {
 	return c.App
 }
 
+func SetLogConfig(log *LogConfig) {
+	c.Log = log
+}
+
 func GetLogConfig() *LogConfig {
 
 	//已存在 -返回
@@ -63,6 +71,10 @@ func GetLogConfig() *LogConfig {
 	}
 
 	return c.Log
+}
+
+func SetHttpConfig(http *HttpConfig) {
+	c.Http = http
 }
 
 func GetHttpConfig() *HttpConfig {
@@ -87,6 +99,10 @@ func GetHttpConfig() *HttpConfig {
 	}
 
 	return c.Http
+}
+
+func SetDatabaseConfig(database *DatabaseConfig) {
+	c.Database = database
 }
 
 func GetDbConfig() DatabaseConfig {
