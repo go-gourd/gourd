@@ -21,10 +21,6 @@ const (
 )
 
 type App struct {
-	Version     int
-	VersionName string
-	Conf        *config.AppConfig
-	TempDir     string
 	DisableLogo bool
 }
 
@@ -34,24 +30,20 @@ func (app *App) Init() {
 	//触发Boot事件
 	event.Trigger("app.boot", nil)
 
-	app.Conf = config.GetAppConfig()
-
-	//临时目录
-	app.TempDir = app.Conf.Temp
-
-	//版本号
-	app.Version = VersionNum
-	app.VersionName = VersionName
+	conf := config.GetAppConfig()
 
 	//版本显示(优先显示配置文件中的版本号)
-	if app.Conf.Version == "" {
-		app.Conf.Version = fmt.Sprintf("%s (%d)", app.VersionName, app.Version)
+	versionName := ""
+	if conf.Version == "" {
+		versionName = fmt.Sprintf("%s (%d)", VersionName, VersionNum)
+	} else {
+		versionName = fmt.Sprintf("%s (%d)", conf.Version, conf.VersionNum)
 	}
 
 	//创建TempDir
-	err := os.MkdirAll(app.TempDir, os.ModePerm)
+	err := os.MkdirAll(conf.Temp, os.ModePerm)
 	if err != nil {
-		log.Errorf("Mkdir \"%s\" error : %s", app.TempDir, err.Error())
+		log.Errorf("Mkdir \"%s\" error : %s", conf.Temp, err.Error())
 		panic(err)
 	}
 
@@ -59,7 +51,7 @@ func (app *App) Init() {
 	if !app.DisableLogo {
 		var logo = "   _____                     _ \n" +
 			"  / ____|                   | |  Go       %s\n" +
-			" | |  __  ___  _   _ _ __ __| |  App      v%s (%d)\n" +
+			" | |  __  ___  _   _ _ __ __| |  App      v%s\n" +
 			" | | |_ |/ _ \\| | | | '__/ _` |  Static   %s\n" +
 			" | |__| | (_) | |_| | | | (_| |  Temp Dir %s\n" +
 			"  \\_____|\\___/ \\__,_|_|  \\__,_|  Log Dir  %s\n" +
@@ -68,8 +60,8 @@ func (app *App) Init() {
 		logFile := config.GetLogConfig().LogFile
 		logDirIndex := strings.LastIndex(logFile, "/")
 		fmt.Printf(
-			logo, runtime.Version(), app.VersionName, app.Version,
-			config.GetHttpConfig().Static, app.TempDir, logFile[:logDirIndex],
+			logo, runtime.Version(), versionName,
+			config.GetHttpConfig().Static, conf.Temp, logFile[:logDirIndex],
 		)
 	}
 
@@ -80,7 +72,7 @@ func (app *App) Init() {
 // Run 启动应用
 func (app *App) Run() {
 
-	//命令行解析
+	//命令行解析并执行
 	cmd.ConsoleParse()
 
 	// 触发Start事件

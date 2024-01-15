@@ -33,7 +33,6 @@ func GetAppConfig() *AppConfig {
 		Debug:   false,
 		Runtime: "./runtime",
 		Temp:    "./runtime/temp",
-		Version: "1.0.0",
 	}
 
 	// 读取配置文件
