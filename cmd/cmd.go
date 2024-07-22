@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/go-gourd/gourd/internal/command"
 	"github.com/go-gourd/gourd/internal/daemon"
-	"github.com/go-gourd/gourd/log"
+	"log/slog"
 	"os"
 	"path"
 	"runtime"
@@ -95,7 +95,7 @@ func coreCmdExec(args []string) bool {
 			} else {
 				//守护进程，成功后会终止当前应用
 				daemon.Run()
-				log.Info("Daemon Running...")
+				slog.Info("Daemon Running...")
 				fmt.Println("[Info] Daemon Running...")
 				os.Exit(0)
 			}
@@ -105,7 +105,7 @@ func coreCmdExec(args []string) bool {
 	case "stop":
 		//停止后台进程
 		daemon.StopDaemonProcess()
-		log.Info("Daemon Process Stopped.")
+		slog.Info("Daemon Process Stopped.")
 		fmt.Println("[Info] Daemon Process Stopped.")
 		os.Exit(0)
 		return false

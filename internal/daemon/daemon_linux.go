@@ -5,9 +5,8 @@ package daemon
 import (
 	"bufio"
 	"fmt"
-	"github.com/go-gourd/gourd/config"
 	"github.com/sevlyar/go-daemon"
-	"log"
+	"log/slog"
 	"os"
 	"strconv"
 	"syscall"
@@ -16,8 +15,7 @@ import (
 // Run 守护进程模式运行
 func Run() {
 
-	tempDir := config.GetAppConfig().Runtime
-	pidFile := tempDir + "/daemon.pid"
+	pidFile := "./daemon.pid"
 
 	//先判断进程是否已存在
 	pid := getPid(pidFile)
@@ -39,7 +37,7 @@ func Run() {
 	ctx := &daemon.Context{
 		//PidFileName: tempDir + "/daemon.pid",
 		//PidFilePerm: 0644,
-		LogFileName: tempDir + "/daemon.log",
+		LogFileName: "./daemon.log",
 		LogFilePerm: 0640,
 		WorkDir:     "./",
 		Umask:       027,
@@ -48,7 +46,7 @@ func Run() {
 
 	d, err := ctx.Reborn()
 	if err != nil {
-		log.Fatal("Unable to run: ", err)
+		slog.Error("Unable to run: ", err)
 	}
 	if d != nil {
 		_ = os.WriteFile(pidFile, []byte(strconv.Itoa(d.Pid)), 0666) //写入文件(字节数组)
@@ -90,7 +88,7 @@ func killPid(pid int) {
 
 // StopDaemonProcess 结束指定进程
 func StopDaemonProcess() {
-	pidFile := config.GetAppConfig().Runtime + "/daemon.pid"
+	pidFile := "./daemon.pid"
 
 	pid := getPid(pidFile)
 	if pid > 0 {

@@ -4,20 +4,18 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-gourd/gourd/cmd"
-	"github.com/go-gourd/gourd/config"
 	"github.com/go-gourd/gourd/event"
-	"github.com/go-gourd/gourd/log"
+	"log/slog"
 	"os"
 	"os/signal"
 	"runtime"
-	"strings"
 	"time"
 )
 
 // 版本信息
 const (
-	VersionNum  = 107
-	VersionName = "1.1.2"
+	VersionNum  = 108
+	VersionName = "1.2.0"
 )
 
 type App struct {
@@ -30,38 +28,22 @@ func (app *App) Init() {
 	//触发Boot事件
 	event.Trigger("app.boot", nil)
 
-	conf := config.GetAppConfig()
-
 	//版本显示(优先显示配置文件中的版本号)
-	versionName := ""
-	if conf.Version == "" {
-		versionName = fmt.Sprintf("%s (%d)", VersionName, VersionNum)
-	} else {
-		versionName = fmt.Sprintf("%s (%d)", conf.Version, conf.VersionNum)
-	}
-
-	//创建TempDir
-	err := os.MkdirAll(conf.Temp, os.ModePerm)
-	if err != nil {
-		log.Errorf("Mkdir \"%s\" error : %s", conf.Temp, err.Error())
-		panic(err)
-	}
+	versionName := fmt.Sprintf("%s (%d)", VersionName, VersionNum)
 
 	//输出Logo信息
 	if !app.DisableLogo {
 		var logo = "   _____                     _ \n" +
-			"  / ____|                   | |  Go       %s\n" +
-			" | |  __  ___  _   _ _ __ __| |  App      v%s\n" +
-			" | | |_ |/ _ \\| | | | '__/ _` |  Static   %s\n" +
-			" | |__| | (_) | |_| | | | (_| |  Temp Dir %s\n" +
-			"  \\_____|\\___/ \\__,_|_|  \\__,_|  Log Dir  %s\n" +
-			"--------------------------------------------------------\n"
+			"  / ____|                   | |  Go        %s\n" +
+			" | |  __  ___  _   _ _ __ __| |  Gourd     v%s\n" +
+			" | | |_ |/ _ \\| | | | '__/ _` |  Platform  %s\n" +
+			" | |__| | (_) | |_| | | | (_| |  Arch      %s\n" +
+			"  \\_____|\\___/ \\__,_|_|  \\__,_|  Time      %s\n" +
+			"------------------------------------------------------------\n"
 
-		logFile := config.GetLogConfig().LogFile
-		logDirIndex := strings.LastIndex(logFile, "/")
 		fmt.Printf(
-			logo, runtime.Version(), versionName,
-			config.GetHttpConfig().Static, conf.Temp, logFile[:logDirIndex],
+			logo, runtime.Version(), versionName, runtime.GOOS,
+			runtime.GOARCH, time.Now().Format("06-01-02 15:04:05"),
 		)
 	}
 
@@ -78,17 +60,17 @@ func (app *App) Run() {
 	// 触发Start事件
 	event.Trigger("app.start", nil)
 
-	// 守护进程 -等待中断信号以优雅地关闭服务器（设置 5 秒的超时时间）
+	// 守护进程 -等待中断信号以用于关闭服务（设置 10 秒的超时时间）
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	log.Info("Shutdown Server ...", log.Skip())
+	slog.Info("Shutdown Server ...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	// 触发停止事件
 	event.Trigger("app.stop", ctx)
 
-	log.Info("Server exiting", log.Skip())
+	slog.Info("Server has exited")
 }
