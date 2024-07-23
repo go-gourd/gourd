@@ -1,5 +1,5 @@
 
-Gourd 1.1
+Gourd 1.2
 ===============
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-gourd/gourd)](https://goreportcard.com/report/github.com/go-gourd/gourd)
@@ -8,12 +8,13 @@ Gourd 1.1
 [![Release](https://img.shields.io/github/release/go-gourd/gourd.svg?style=flat-square)](https://github.com/go-gourd/gourd/releases)
 
 ```text
-   _____                     _
-  / ____|                   | |  Go       go1.21.1
- | |  __  ___  _   _ _ __ __| |  App      v1.1.0 (105)
- | | |_ |/ _ \| | | | '__/ _` |  Public   ./web/static
- | |__| | (_) | |_| | | | (_| |  Temp Dir ./runtime
-  \_____|\___/ \__,_|_|  \__,_|  Log Dir  ./runtime/log
+   _____                     _ 
+  / ____|                   | |  Go        go1.22.5
+ | |  __  ___  _   _ _ __ __| |  Gourd     v1.2.0 (108)
+ | | |_ |/ _ \| | | | '__/ _` |  Platform  windows
+ | |__| | (_) | |_| | | | (_| |  Arch      amd64
+  \_____|\___/ \__,_|_|  \__,_|  Time      24-07-23 16:00:00
+------------------------------------------------------------
 ```
 > Go-Gourd 是一个由事件驱动的快速开发框架，轻量、高效、易用。
 
@@ -23,7 +24,6 @@ Gourd 1.1
 * 定时任务
 * 命令行
 * 守护进程（仅linux）
-* 日志工具
 
 ## 快速开始
 使用git clone下载示例项目

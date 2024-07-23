@@ -3,7 +3,6 @@ module github.com/go-gourd/gourd
 go 1.22
 
 require (
-	github.com/pelletier/go-toml/v2 v2.2.2
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sevlyar/go-daemon v0.1.6
 )
