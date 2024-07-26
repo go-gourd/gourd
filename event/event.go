@@ -1,32 +1,33 @@
 package event
 
 import (
+	"context"
 	"regexp"
 	"strings"
 )
 
-type HandlerEvent func(params any)
+type Handler func(ctx context.Context)
 
 // 存放注册的事件回调
-var event = make(map[string][]HandlerEvent)
+var event = make(map[string][]Handler)
 
 // Listen 监听事件
-func Listen(name string, callback HandlerEvent) {
+func Listen(name string, callback Handler) {
 	if _, ok := event[name]; ok {
 		event[name] = append(event[name], callback)
 	} else {
-		event[name] = []HandlerEvent{
+		event[name] = []Handler{
 			callback,
 		}
 	}
 }
 
 // Trigger 触发事件
-func Trigger(name string, params any) {
+func Trigger(name string, ctx context.Context) {
 	for eventName, handlers := range event {
 		if matchEventName(eventName, name) {
 			for _, handler := range handlers {
-				handler(params)
+				handler(ctx)
 			}
 		}
 	}

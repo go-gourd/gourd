@@ -1,6 +1,7 @@
 package cron
 
 import (
+	"context"
 	"github.com/go-gourd/gourd/event"
 	"github.com/robfig/cron/v3"
 )
@@ -25,7 +26,7 @@ func Init() {
 	c = cron.New()
 
 	//系统启动
-	event.Listen("app.start", func(_ any) {
+	event.Listen("app.start", func(ctx context.Context) {
 		// 开始执行（每个任务会在自己的 goroutine 中执行）
 		c.Start()
 	})

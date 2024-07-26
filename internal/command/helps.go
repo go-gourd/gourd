@@ -3,7 +3,7 @@ package command
 const CmdDetail = `
 Commands:
   start    Start app
-   -d  Daemon process
+    -d  Daemon process
   restart  Restart daemon process
   stop     Stop daemon process
 `

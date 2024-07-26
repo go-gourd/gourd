@@ -35,7 +35,7 @@ func SetDefault(cmd Commend) {
 // Exec 执行命令行（由框架完成此操作）
 func Exec(name string, args []string) error {
 
-	//首先判断是否内置命令
+	// 首先判断是否内置命令
 	ok := coreCmdExec(args)
 	if !ok {
 		return nil
@@ -50,6 +50,7 @@ func Exec(name string, args []string) error {
 	return nil
 }
 
+// ConsoleParse 解析命令行
 func ConsoleParse() {
 
 	// 取出运行参数

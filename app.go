@@ -19,14 +19,20 @@ const (
 )
 
 type App struct {
-	DisableLogo bool
+	DisableLogo  bool
+	EventHandler event.Handler
+	Context      context.Context
 }
 
 // Init 初始化应用
 func (app *App) Init() {
 
+	if app.Context == nil {
+		app.Context = context.Background()
+	}
+
 	//触发Boot事件
-	event.Trigger("app.boot", nil)
+	event.Trigger("app.boot", app.Context)
 
 	//版本显示(优先显示配置文件中的版本号)
 	versionName := fmt.Sprintf("%s (%d)", VersionName, VersionNum)
@@ -48,7 +54,7 @@ func (app *App) Init() {
 	}
 
 	// 触发Init事件
-	event.Trigger("app.init", nil)
+	event.Trigger("app.init", app.Context)
 }
 
 // Run 启动应用
@@ -58,7 +64,7 @@ func (app *App) Run() {
 	cmd.ConsoleParse()
 
 	// 触发Start事件
-	event.Trigger("app.start", nil)
+	event.Trigger("app.start", app.Context)
 
 	// 守护进程 -等待中断信号以用于关闭服务（设置 10 秒的超时时间）
 	quit := make(chan os.Signal)
@@ -66,7 +72,7 @@ func (app *App) Run() {
 	<-quit
 	slog.Info("Shutdown Server ...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(app.Context, 10*time.Second)
 	defer cancel()
 
 	// 触发停止事件
