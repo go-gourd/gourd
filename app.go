@@ -31,6 +31,11 @@ func (app *App) Init() {
 		app.Context = context.Background()
 	}
 
+	// 初始化事件
+	if app.EventHandler != nil {
+		app.EventHandler(app.Context)
+	}
+
 	//触发Boot事件
 	event.Trigger("app.boot", app.Context)
 
