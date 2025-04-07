@@ -1,47 +1,61 @@
 package event
 
 import (
-	"context"
-	"regexp"
-	"strings"
+    "context"
+    "regexp"
+    "strings"
+    "sync"
 )
 
 type Handler func(ctx context.Context)
 
-// 存放注册的事件回调
-var event = make(map[string][]Handler)
+// 全局单例
+var globalManager = NewEventManager()
 
-// Listen 监听事件
 func Listen(name string, callback Handler) {
-	if _, ok := event[name]; ok {
-		event[name] = append(event[name], callback)
-	} else {
-		event[name] = []Handler{
-			callback,
-		}
-	}
+    globalManager.Listen(name, callback)
+}
+
+func Trigger(name string, ctx context.Context) {
+    globalManager.Trigger(name, ctx)
+}
+
+type Manager struct {
+    handlers map[string][]Handler // 存储所有事件处理器（key为注册时的原始名称）
+    mu       sync.RWMutex
+}
+
+func NewEventManager() *Manager {
+    return &Manager{
+        handlers: make(map[string][]Handler),
+    }
+}
+
+// Listen 注册事件处理器
+func (em *Manager) Listen(name string, callback Handler) {
+    em.mu.Lock()
+    defer em.mu.Unlock()
+    em.handlers[name] = append(em.handlers[name], callback)
 }
 
 // Trigger 触发事件
-func Trigger(name string, ctx context.Context) {
-	for eventName, handlers := range event {
-		if matchEventName(eventName, name) {
-			for _, handler := range handlers {
-				handler(ctx)
-			}
-		}
-	}
-	return
-}
+func (em *Manager) Trigger(pattern string, ctx context.Context) {
+    em.mu.RLock()
+    defer em.mu.RUnlock()
 
-// 匹配事件名称
-func matchEventName(eventName, pattern string) bool {
-	if eventName == pattern {
-		return true
-	}
-	escapedEventName := regexp.QuoteMeta(eventName)
-	regexPattern := "^" + strings.Replace(pattern, "*", ".*", -1) + "$"
+    // 构造正则表达式（将 * 转换为 .*）
+    regexPattern := "^" + strings.ReplaceAll(regexp.QuoteMeta(pattern), "\\*", ".*") + "$"
+    reg, err := regexp.Compile(regexPattern)
+    if err != nil {
+        return
+    }
 
-	matched, _ := regexp.MatchString(regexPattern, escapedEventName)
-	return matched
+    // 遍历所有已注册的事件名
+    for eventName, handlers := range em.handlers {
+        if reg.MatchString(eventName) {
+            for _, h := range handlers {
+                h(ctx)
+            }
+        }
+    }
 }
