@@ -12,11 +12,23 @@ import (
 	"syscall"
 )
 
-// Run 守护进程模式运行
-func Run() {
+var (
+	pidFile = "./daemon.pid"
+	logFile = "./daemon.log"
+)
 
-	pidFile := "./daemon.pid"
+// SetPidFile 设置pid文件
+func SetPidFile(file string) {
+	pidFile = file
+}
 
+// SetLogFile 设置日志文件
+func SetLogFile(file string) {
+	logFile = file
+}
+
+// Start 守护进程模式运行
+func Start() {
 	//先判断进程是否已存在
 	pid := getPid(pidFile)
 	if pid > 0 {
@@ -37,7 +49,7 @@ func Run() {
 	ctx := &daemon.Context{
 		//PidFileName: tempDir + "/daemon.pid",
 		//PidFilePerm: 0644,
-		LogFileName: "./daemon.log",
+		LogFileName: logFile,
 		LogFilePerm: 0640,
 		WorkDir:     "./",
 		Umask:       027,
@@ -51,6 +63,18 @@ func Run() {
 	if d != nil {
 		_ = os.WriteFile(pidFile, []byte(strconv.Itoa(d.Pid)), 0666) //写入文件(字节数组)
 		_ = ctx.Release()
+	}
+}
+
+// Stop 停止守护进程
+func Stop() {
+	pid := getPid(pidFile)
+	if pid > 0 {
+		// pid存在
+		killPid(pid)
+		_ = os.Remove(pidFile)
+	} else {
+		fmt.Println("daemon process pid not exist")
 	}
 }
 
@@ -83,19 +107,5 @@ func killPid(pid int) {
 	if err == nil {
 		// 进程存在
 		_ = syscall.Kill(pid, syscall.SIGINT)
-	}
-}
-
-// StopDaemonProcess 结束指定进程
-func StopDaemonProcess() {
-	pidFile := "./daemon.pid"
-
-	pid := getPid(pidFile)
-	if pid > 0 {
-		// pid存在
-		killPid(pid)
-		_ = os.Remove(pidFile)
-	} else {
-		fmt.Println("daemon process pid not exist")
 	}
 }

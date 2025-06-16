@@ -2,11 +2,11 @@
 
 package daemon
 
-// Run 守护进程模式运行
-func Run() {
+// Start 守护进程模式运行
+func Start() {
 	//win平台不支持
 }
 
-// StopDaemonProcess 结束指定进程
-func StopDaemonProcess() {
+// Stop 停止守护进程
+func Stop() {
 }
