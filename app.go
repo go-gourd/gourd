@@ -15,7 +15,7 @@ import (
 // 版本信息
 const (
 	VersionNum  = 110
-	VersionName = "1.3.1"
+	VersionName = "1.4.0"
 )
 
 type App struct {
@@ -23,6 +23,7 @@ type App struct {
 	EventHandler event.Handler
 	Context      context.Context
 	ConfigDir    string
+	cancel       context.CancelFunc
 }
 
 // Init 初始化应用
@@ -31,6 +32,11 @@ func (app *App) Init() {
 	if app.Context == nil {
 		app.Context = context.Background()
 	}
+
+	// 创建运行时可取消上下文
+	runCtx, runCancel := context.WithCancel(app.Context)
+	app.Context = runCtx
+	app.cancel = runCancel
 
 	// 初始化事件
 	if app.EventHandler != nil {
@@ -73,16 +79,21 @@ func (app *App) Run() {
 	event.Trigger("app.start", app.Context)
 
 	// 守护进程 -等待中断信号以用于关闭服务（设置 10 秒的超时时间）
-	quit := make(chan os.Signal)
+	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
+	signal.Stop(quit)
 	slog.Info("Shutdown Server ...")
 
-	ctx, cancel := context.WithTimeout(app.Context, 10*time.Second)
-	defer cancel()
+	// 通知协程停止
+	app.cancel()
+
+	// 创建 10 秒超时上下文用于退出流程
+	shutdownCtx, shutdownCancel := context.WithTimeout(app.Context, 10*time.Second)
+	defer shutdownCancel()
 
 	// 触发停止事件
-	event.Trigger("app.stop", ctx)
+	event.Trigger("app.stop", shutdownCtx)
 
 	slog.Info("Server has exited")
 }
