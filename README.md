@@ -1,5 +1,5 @@
 
-Gourd 1.2
+Gourd V1
 ===============
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-gourd/gourd)](https://goreportcard.com/report/github.com/go-gourd/gourd)
@@ -9,11 +9,11 @@ Gourd 1.2
 
 ```text
    _____                     _ 
-  / ____|                   | |  Go        go1.22.5
- | |  __  ___  _   _ _ __ __| |  Gourd     v1.2.0 (108)
+  / ____|                   | |  Go        go1.23.0
+ | |  __  ___  _   _ _ __ __| |  Gourd     v1.4.0 (140)
  | | |_ |/ _ \| | | | '__/ _` |  Platform  windows
  | |__| | (_) | |_| | | | (_| |  Arch      amd64
-  \_____|\___/ \__,_|_|  \__,_|  Time      24-07-23 16:00:00
+  \_____|\___/ \__,_|_|  \__,_|  Time      25-06-30 16:00:00
 ------------------------------------------------------------
 ```
 > Go-Gourd 是一个由事件驱动的快速开发框架，轻量、高效、易用。

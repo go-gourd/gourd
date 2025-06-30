@@ -14,7 +14,7 @@ import (
 
 // 版本信息
 const (
-	VersionNum  = 110
+	VersionNum  = 140
 	VersionName = "1.4.0"
 )
 
