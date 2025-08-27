@@ -3,13 +3,14 @@ package gourd
 import (
 	"context"
 	"fmt"
-	"github.com/go-gourd/gourd/cmd"
-	"github.com/go-gourd/gourd/event"
 	"log/slog"
 	"os"
 	"os/signal"
 	"runtime"
 	"time"
+
+	"github.com/go-gourd/gourd/cmd"
+	"github.com/go-gourd/gourd/event"
 )
 
 // 版本信息

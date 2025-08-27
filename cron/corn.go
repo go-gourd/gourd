@@ -1,9 +1,10 @@
 package cron
 
 import (
-    "context"
-    "github.com/go-gourd/gourd/event"
-    "github.com/robfig/cron/v3"
+	"context"
+
+	"github.com/go-gourd/gourd/event"
+	"github.com/robfig/cron/v3"
 )
 
 //cron 表达式使用 6 个空格分隔的字段表示一组时间。
@@ -20,39 +21,39 @@ var c *cron.Cron
 
 // Init 初始化定时任务 -由框架自动完成
 func Init() {
-    if c != nil {
-        return
-    }
-    c = cron.New()
+	if c != nil {
+		return
+	}
+	c = cron.New()
 
-    //系统启动
-    event.Listen("app.start", func(ctx context.Context) {
-        // 开始执行（每个任务会在自己的 goroutine 中执行）
-        c.Start()
-    })
+	//系统启动
+	event.Listen("app.start", func(ctx context.Context) {
+		// 开始执行（每个任务会在自己的 goroutine 中执行）
+		c.Start()
+	})
 
-    // 使用携程启动
-    go c.Run()
+	// 使用携程启动
+	go c.Run()
 }
 
 // Add 添加一个定时任务
 func Add(spec string, cmd func()) error {
-    Init()
+	Init()
 
-    // 开始执行（每个任务会在自己的 goroutine 中执行）
-    _, err := c.AddFunc(spec, cmd)
-    return err
+	// 开始执行（每个任务会在自己的 goroutine 中执行）
+	_, err := c.AddFunc(spec, cmd)
+	return err
 }
 
 // Entries 返回任务列表
 func Entries() []cron.Entry {
-    return c.Entries()
+	return c.Entries()
 }
 
 // Stop 停止定时任务运行
 func Stop() {
-    if c == nil {
-        return
-    }
-    c.Stop()
+	if c == nil {
+		return
+	}
+	c.Stop()
 }

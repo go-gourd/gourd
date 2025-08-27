@@ -5,11 +5,12 @@ package daemon
 import (
 	"bufio"
 	"fmt"
-	"github.com/sevlyar/go-daemon"
 	"log/slog"
 	"os"
 	"strconv"
 	"syscall"
+
+	"github.com/sevlyar/go-daemon"
 )
 
 var (

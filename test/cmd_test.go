@@ -2,8 +2,9 @@ package test
 
 import (
 	"fmt"
-	"github.com/go-gourd/gourd/cmd"
 	"testing"
+
+	"github.com/go-gourd/gourd/cmd"
 )
 
 func TestCmd(t *testing.T) {

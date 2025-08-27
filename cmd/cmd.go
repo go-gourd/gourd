@@ -3,13 +3,14 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/go-gourd/gourd/internal/command"
-	"github.com/go-gourd/gourd/internal/daemon"
 	"log/slog"
 	"os"
 	"path"
 	"runtime"
 	"strings"
+
+	"github.com/go-gourd/gourd/internal/command"
+	"github.com/go-gourd/gourd/internal/daemon"
 )
 
 type Commend struct {
