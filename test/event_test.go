@@ -10,40 +10,40 @@ import (
 
 func TestEvent(t *testing.T) {
 
-	// register event listener
-	event.Listen("test.add", func(ctx context.Context) {
-		fmt.Println("test.add", ctx)
+	// register event listener with pattern
+	event.Listen("test.*", func(ctx context.Context) {
+		fmt.Println("test.*", ctx)
 	})
 
-	event.Listen("test.edit", func(ctx context.Context) {
-		fmt.Println("test.edit", ctx)
+	event.Listen("*.add", func(ctx context.Context) {
+		fmt.Println("*.add", ctx)
 	})
 
-	event.Listen("user.add", func(ctx context.Context) {
-		fmt.Println("user.add", ctx)
+	event.Listen("user.*", func(ctx context.Context) {
+		fmt.Println("user.*", ctx)
 	})
 
-	event.Listen("user.edit", func(ctx context.Context) {
-		fmt.Println("user.edit", ctx)
+	event.Listen("user.*.edit", func(ctx context.Context) {
+		fmt.Println("user.*.edit", ctx)
 	})
 
-	event.Listen("user.address.add", func(ctx context.Context) {
+	event.Listen("user.address.*", func(ctx context.Context) {
 		value := ctx.Value("test_key")
-		fmt.Println("user.address.add", value)
+		fmt.Println("user.address.*", value)
 	})
 
-	// trigger event
+	// trigger event with exact name
 	ctx := context.WithValue(context.Background(), "test_key", "test_value")
 
-	fmt.Println("---------test.*-----------")
-	event.Trigger("test.*", ctx)
+	fmt.Println("---------test.add-----------")
+	event.Trigger("test.add", ctx)
 
-	fmt.Println("---------*.add-----------")
-	event.Trigger("*.add", ctx)
+	fmt.Println("---------user.edit-----------")
+	event.Trigger("user.edit", ctx)
 
 	fmt.Println("---------user.address.add-----------")
 	event.Trigger("user.address.add", ctx)
-
-	fmt.Println("---------user.*.add-----------")
-	event.Trigger("user.*.add", ctx)
+	
+	fmt.Println("---------user.profile.edit-----------")
+	event.Trigger("user.profile.edit", ctx)
 }
