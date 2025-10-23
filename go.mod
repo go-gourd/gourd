@@ -1,6 +1,6 @@
 module github.com/go-gourd/gourd
 
-go 1.23.0
+go 1.24.0
 
 require (
 	github.com/robfig/cron/v3 v3.0.1
@@ -9,5 +9,5 @@ require (
 
 require (
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 // indirect
-	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/sys v0.37.0 // indirect
 )
